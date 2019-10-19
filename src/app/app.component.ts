@@ -1,8 +1,8 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AppService} from './app.service';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
-import {MatTableDataSource} from '@angular/material';
+import {MatSort, MatTableDataSource} from '@angular/material';
 
 @Component({
   selector: 'app-root',
@@ -17,9 +17,12 @@ export class AppComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['name', 'weight', 'symbol', 'position'];
   columnsToDisplay: string[] = this.displayedColumns.slice();
 
+  @ViewChild(MatSort, {static: true}) matSort: MatSort;
+
   constructor(private appService: AppService) {}
 
   ngOnInit(): void {
+    this.dataSource.sort = this.matSort;
 
     this.appService.fetchData()
       .pipe(takeUntil(this.unsubscribe))

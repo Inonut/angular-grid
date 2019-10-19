@@ -4,7 +4,7 @@
   <button mat-raised-button (click)="shuffle()"> Shuffle </button>
 </div>
 
-<isx-virtual-scroll-viewport-container [dataSource]="dataSource" #isxVirtualScrollViewportContainer=isxVirtualScrollViewportContainer>
+<isx-virtual-scroll-viewport-container [dataSource]="dataSource" #isxVirtualScrollViewportContainer=isxVirtualScrollViewportContainer [headerHeight]="20" [rowHeight]="22">
   <cdk-virtual-scroll-viewport>
     <isx-table [dataSource]="isxVirtualScrollViewportContainer.scrolledDataSource">
       <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">

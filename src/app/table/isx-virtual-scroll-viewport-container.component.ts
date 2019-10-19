@@ -33,7 +33,7 @@ import {startWith, takeUntil, tap} from 'rxjs/operators';
 export class IsxVirtualScrollViewportContainerComponent implements AfterViewInit, OnDestroy {
   private unsubscribe = new Subject();
 
-  static BUFFER_SIZE = 3;
+  static BUFFER_SIZE = 20;
   private range = 0;
 
   scrolledDataSource = new MatTableDataSource();
