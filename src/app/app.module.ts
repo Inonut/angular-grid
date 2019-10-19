@@ -8,11 +8,13 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material';
 import {DemoMaterialModule} from './material.module';
 import { TableComponent } from './table/table.component';
+import {IsxVirtualScrollViewportContainerComponent} from './table/isx-virtual-scroll-viewport-container.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    TableComponent
+    TableComponent,
+    IsxVirtualScrollViewportContainerComponent
   ],
   imports: [
     BrowserModule,

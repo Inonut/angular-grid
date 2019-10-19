@@ -9,51 +9,23 @@ import {VIRTUAL_SCROLL_STRATEGY} from '@angular/cdk/scrolling';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  providers: [{
-    provide: VIRTUAL_SCROLL_STRATEGY,
-    useClass: TableVirtualScrollStrategy,
-  }],
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
   private unsubscribe = new Subject();
 
   dataSource = new MatTableDataSource<PeriodicElement>();
-  scrolledDataSource = new MatTableDataSource<PeriodicElement>();
 
   displayedColumns: string[] = ['name', 'weight', 'symbol', 'position'];
   columnsToDisplay: string[] = this.displayedColumns.slice();
 
-  static BUFFER_SIZE = 3;
-  rowHeight = 32;
-  headerHeight = 32;
-  gridHeight = 400;
-
-  constructor(private appService: AppService,
-              @Inject(VIRTUAL_SCROLL_STRATEGY) private readonly scrollStrategy: TableVirtualScrollStrategy) {}
+  constructor(private appService: AppService) {}
 
   ngOnInit(): void {
 
     this.appService.fetchData()
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((data) => this.dataSource.data = data);
-
-
-    const range = Math.ceil(this.gridHeight / this.rowHeight) + AppComponent.BUFFER_SIZE;
-    this.scrollStrategy.setScrollHeight(this.rowHeight, this.headerHeight);
-
-    combineLatest([this.dataSource.connect(), this.scrollStrategy.scrolledIndexChange])
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe((value: any) => {
-
-        // Determine the start and end rendered range
-        const start = Math.max(0, value[1] - AppComponent.BUFFER_SIZE);
-        const end = Math.min(value[0].length, value[1] + range);
-
-        // Update the datasource for the rendered range of data
-        // return value[0].slice(start, end);
-        this.scrolledDataSource.data = value[0].slice(start, end);
-      });
   }
 
   ngOnDestroy(): void {

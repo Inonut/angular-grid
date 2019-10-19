@@ -4,17 +4,19 @@
   <button mat-raised-button (click)="shuffle()"> Shuffle </button>
 </div>
 
-<cdk-virtual-scroll-viewport [style.height.px]="gridHeight">
-  <isx-table [dataSource]="scrolledDataSource">
-    <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
-      <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
-    </ng-container>
+<isx-virtual-scroll-viewport-container [dataSource]="dataSource" #isxVirtualScrollViewportContainer=isxVirtualScrollViewportContainer>
+  <cdk-virtual-scroll-viewport>
+    <isx-table [dataSource]="isxVirtualScrollViewportContainer.scrolledDataSource">
+      <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
+        <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+      </ng-container>
 
-    <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
+      <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
 
-    <ng-template let-row matRowDef cdkVirtualFor [matRowDefColumns]="columnsToDisplay" [cdkVirtualForOf]="dataSource.data">
-      <mat-row></mat-row>
-    </ng-template>
-  </isx-table>
-</cdk-virtual-scroll-viewport>
+      <ng-template let-row matRowDef cdkVirtualFor [matRowDefColumns]="columnsToDisplay" [cdkVirtualForOf]="isxVirtualScrollViewportContainer.dataSource">
+        <mat-row></mat-row>
+      </ng-template>
+    </isx-table>
+  </cdk-virtual-scroll-viewport>
+</isx-virtual-scroll-viewport-container>
