@@ -61,15 +61,15 @@ export class IsxVirtualScrollViewportContainerComponent implements AfterViewInit
 
     combineLatest([this.dataSource.connect(), this.scrollStrategy.scrolledIndexChange, resizeStream])
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe((value: any) => {
+      .subscribe(([data, scrolledindex]) => {
 
         // Determine the start and end rendered range
-        const start = Math.max(0, value[1] - IsxVirtualScrollViewportContainerComponent.BUFFER_SIZE);
-        const end = Math.min(value[0].length, value[1] + this.range);
+        const start = Math.max(0, scrolledindex - IsxVirtualScrollViewportContainerComponent.BUFFER_SIZE);
+        const end = Math.min(data.length, scrolledindex + this.range);
 
         // Update the datasource for the rendered range of data
         // return value[0].slice(start, end);
-        this.scrolledDataSource.data = value[0].slice(start, end);
+        this.scrolledDataSource.data = data.slice(start, end);
       });
   }
 
