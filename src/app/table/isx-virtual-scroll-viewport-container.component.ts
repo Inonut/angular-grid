@@ -77,4 +77,8 @@ export class IsxVirtualScrollViewportContainerComponent implements AfterViewInit
     this.unsubscribe.next();
     this.unsubscribe.complete();
   }
+
+  getOffsetToRenderedContentStart() {
+    return this.scrollStrategy.getOffsetToRenderedContentStart();
+  }
 }

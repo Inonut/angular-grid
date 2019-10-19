@@ -56,13 +56,19 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
     this.updateContent(this.viewport);
   }
 
+  public getOffsetToRenderedContentStart() {
+    if(this.viewport == null) {
+      return 0;
+    }
+
+    return this.viewport.getOffsetToRenderedContentStart();
+  }
+
   private updateContent(viewport: CdkVirtualScrollViewport) {
     if (this.viewport) {
       const newIndex = Math.max(0, Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) - 2);
       viewport.setRenderedContentOffset(this.scrollHeight * newIndex);
-      this.indexChange.next(
-        Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) + 1
-      );
+      this.indexChange.next(Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) + 1);
     }
   }
 }

@@ -12,7 +12,7 @@
         <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
       </ng-container>
 
-      <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
+      <mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true" [style.top.px]="-isxVirtualScrollViewportContainer.getOffsetToRenderedContentStart()"></mat-header-row>
 
       <ng-template let-row matRowDef cdkVirtualFor [matRowDefColumns]="columnsToDisplay" [cdkVirtualForOf]="isxVirtualScrollViewportContainer.dataSource">
         <mat-row></mat-row>

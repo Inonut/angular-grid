@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
 
+  .mat-header-row {
+    background: aquamarine;
+  }
+
   .mat-header-row,
   .mat-row {
     display: flex;

@@ -1,10 +1,8 @@
-import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AppService} from './app.service';
 import {takeUntil} from 'rxjs/operators';
-import {combineLatest, Subject} from 'rxjs';
+import {Subject} from 'rxjs';
 import {MatTableDataSource} from '@angular/material';
-import {TableVirtualScrollStrategy} from './table/table-vs-strategy';
-import {VIRTUAL_SCROLL_STRATEGY} from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-root',
