@@ -5,7 +5,7 @@
 </div>
 
 <isx-virtual-scroll-viewport-container [dataSource]="dataSource" #isxVirtualScrollViewportContainer=isxVirtualScrollViewportContainer [headerHeight]="20" [rowHeight]="22">
-  <cdk-virtual-scroll-viewport>
+  <cdk-virtual-scroll-viewport (scrolledIndexChange)="fetchNextPage($event)">
     <isx-table matSort [dataSource]="isxVirtualScrollViewportContainer.scrolledDataSource">
       <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
         <mat-header-cell *matHeaderCellDef mat-sort-header> {{column}} </mat-header-cell>

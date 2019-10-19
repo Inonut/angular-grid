@@ -58,6 +58,13 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  fetchNextPage(index: number) {
+    if(index >= this.dataSource.data.length - 100) {
+      this.appService.fetchData()
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe((data) => this.dataSource.data = this.dataSource.data.concat(data));
+    }
+  }
 }
 
 
