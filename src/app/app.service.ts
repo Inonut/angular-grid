@@ -10,6 +10,7 @@ export class AppService {
   fetchData(): Observable<PeriodicElement[]> {
     return of(ELEMENT_DATA);
   }
+
 }
 
 

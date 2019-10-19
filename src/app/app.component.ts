@@ -2,6 +2,8 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AppService} from './app.service';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
+import {DataSource} from '@angular/cdk/collections';
+import {MatTableDataSource} from '@angular/material';
 
 @Component({
   selector: 'app-root',
@@ -9,12 +11,12 @@ import {Subject} from 'rxjs';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-
   private unsubscribe = new Subject();
+
+  dataSource = new MatTableDataSource<PeriodicElement>();
 
   displayedColumns: string[] = ['name', 'weight', 'symbol', 'position'];
   columnsToDisplay: string[] = this.displayedColumns.slice();
-  data: PeriodicElement[] = [];
 
   constructor(private appService: AppService) {}
 
@@ -22,7 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.appService.fetchData()
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe((data) => this.data = data);
+      .subscribe((data) => this.dataSource.data = data);
   }
 
   ngOnDestroy(): void {
