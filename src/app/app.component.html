@@ -4,12 +4,17 @@
   <button mat-raised-button (click)="shuffle()"> Shuffle </button>
 </div>
 
-<mat-table [dataSource]="dataSource" class="isx-table" >
-  <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
-    <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
-    <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
-  </ng-container>
+<cdk-virtual-scroll-viewport [style.height.px]="gridHeight">
+  <isx-table [dataSource]="scrolledDataSource">
+    <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
+      <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+    </ng-container>
 
-  <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
-  <mat-row *matRowDef="let row; columns: columnsToDisplay;"></mat-row>
-</mat-table>
+    <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
+
+    <ng-template let-row matRowDef cdkVirtualFor [matRowDefColumns]="columnsToDisplay" [cdkVirtualForOf]="dataSource.data">
+      <mat-row></mat-row>
+    </ng-template>
+  </isx-table>
+</cdk-virtual-scroll-viewport>

@@ -1,0 +1,16 @@
+.isx-table {
+  display: flex;
+  flex-direction: column;
+
+  .mat-header-row,
+  .mat-row {
+    display: flex;
+
+    .mat-header-cell,
+    .mat-cell {
+      flex: 1;
+      padding: 7px;
+      border: 1px solid black;
+    }
+  }
+}
