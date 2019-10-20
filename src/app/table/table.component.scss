@@ -24,6 +24,7 @@
 
       &.isx-drag-column {
         pointer-events: none;
+        z-index: 1;
       }
       &:not(.isx-drag-column) {
         transition: transform 0.2s ease;

@@ -12,8 +12,8 @@
                isxColumnResize>
       <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
         <ng-container *ngIf="column != 'name'">
-          <mat-header-cell *matHeaderCellDef mat-sort-header isx-column-drag-header isx-column-resize-header [style.width.px]="60"> {{format(column)}} </mat-header-cell>
-          <mat-cell *matCellDef="let element" isx-column-drag-cell isx-column-resize-cell [style.width.px]="60"> {{element[column]}} </mat-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header isx-column-drag-header isx-column-resize-header [style.width.px]="100"> {{format(column)}} </mat-header-cell>
+          <mat-cell *matCellDef="let element" isx-column-drag-cell isx-column-resize-cell [style.width.px]="100"> {{element[column]}} </mat-cell>
         </ng-container>
         <ng-container *ngIf="column == 'name'">
           <mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="60"> {{format(column)}} - no drag </mat-header-cell>
