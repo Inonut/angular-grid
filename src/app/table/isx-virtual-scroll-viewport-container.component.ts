@@ -33,7 +33,6 @@ import {startWith, takeUntil, tap} from 'rxjs/operators';
 export class IsxVirtualScrollViewportContainerComponent implements AfterViewInit, OnDestroy {
   private unsubscribe = new Subject();
 
-  static BUFFER_SIZE = 20;
   private range = 0;
 
   scrolledDataSource = new MatTableDataSource();
@@ -54,7 +53,7 @@ export class IsxVirtualScrollViewportContainerComponent implements AfterViewInit
         tap(() => {
           let gridHeight= this.el.nativeElement.clientHeight;
 
-          this.range = Math.ceil(gridHeight / this.rowHeight) + IsxVirtualScrollViewportContainerComponent.BUFFER_SIZE;
+          this.range = Math.ceil(gridHeight / this.rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE;
           this.scrollStrategy.setScrollHeight(this.rowHeight, this.headerHeight);
         })
       );
@@ -64,9 +63,10 @@ export class IsxVirtualScrollViewportContainerComponent implements AfterViewInit
       .subscribe(([data, scrolledindex]) => {
 
         // Determine the start and end rendered range
-        const start = Math.max(0, scrolledindex - IsxVirtualScrollViewportContainerComponent.BUFFER_SIZE);
+        const start = Math.max(0, scrolledindex - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
         const end = Math.min(data.length, scrolledindex + this.range);
 
+        console.log(start, end);
         // Update the datasource for the rendered range of data
         // return value[0].slice(start, end);
         this.scrolledDataSource.data = data.slice(start, end);

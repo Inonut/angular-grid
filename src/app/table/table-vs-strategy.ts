@@ -6,6 +6,8 @@ import { distinctUntilChanged } from 'rxjs/operators';
 @Injectable()
 export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
+  static BUFFER_SIZE = 20;
+
   private scrollHeight!: number;
   private scrollHeader!: number;
   private readonly indexChange = new Subject<number>();
@@ -66,7 +68,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
   private updateContent(viewport: CdkVirtualScrollViewport) {
     if (this.viewport) {
-      const newIndex = Math.max(0, Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) - 10);
+      const newIndex = Math.max(0, Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
       viewport.setRenderedContentOffset(this.scrollHeight * newIndex);
       this.indexChange.next(Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) + 1);
     }
