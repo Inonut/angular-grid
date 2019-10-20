@@ -31,6 +31,12 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
       this.newOrder = val.slice();
     };
 
+    // @ts-ignore
+    val.pop = (e) => {
+      Array.prototype.pop.call(val, e);
+      this.newOrder = val.slice();
+    };
+
     this.newOrder = val.slice();
   }
 
@@ -40,42 +46,44 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.leftDragStream
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(({event, name}) => {
-        if(this.newOrder.indexOf(name) != 0) {
-          let colName = this.newOrder[this.newOrder.indexOf(name) - 1];
+    this.ngZone.runOutsideAngular(() => {
+      this.leftDragStream
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(({event, name}) => {
+          if(this.newOrder.indexOf(name) != 0) {
+            let colName = this.newOrder[this.newOrder.indexOf(name) - 1];
 
-          if(this.columnsCache[colName] && this.processColumnWidth(name) + event.deltaX + this.added < this.processColumnWidth(colName) / 2) {
-            this.columnsCache[colName].forEach(directive => directive.moveTo(this.processColumnWidth(name), true));
-            this.swap(this.newOrder.indexOf(name), this.newOrder.indexOf(name) - 1);
-            this.added += this.processColumnWidth(colName);
+            if(this.columnsCache[colName] && this.processColumnWidth(name) + event.deltaX + this.added < this.processColumnWidth(colName) / 2) {
+              this.columnsCache[colName].forEach(directive => directive.moveTo(this.processColumnWidth(name), true));
+              this.swap(this.newOrder.indexOf(name), this.newOrder.indexOf(name) - 1);
+              this.added += this.processColumnWidth(colName);
+            }
           }
-        }
-      });
-
-    this.rightDragStream
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(({event, name}) => {
-        if(this.newOrder.indexOf(name) != this.newOrder.length - 1) {
-          let colName = this.newOrder[this.newOrder.indexOf(name) + 1];
-
-          if(this.columnsCache[colName] && this.processColumnWidth(name) - event.deltaX - this.added < this.processColumnWidth(colName) / 2) {
-            this.columnsCache[colName].forEach(directive => directive.moveTo(-this.processColumnWidth(name), true));
-            this.swap(this.newOrder.indexOf(name), this.newOrder.indexOf(name) + 1);
-            this.added -= this.processColumnWidth(colName);
-          }
-        }
-      });
-
-    this.dropStream
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(({event, name}) => {
-        this.ngZone.run(() => {
-          this.drop.emit(this.newOrder);
         });
-        this.added = 0;
-      });
+
+      this.rightDragStream
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(({event, name}) => {
+          if(this.newOrder.indexOf(name) != this.newOrder.length - 1) {
+            let colName = this.newOrder[this.newOrder.indexOf(name) + 1];
+
+            if(this.columnsCache[colName] && this.processColumnWidth(name) - event.deltaX - this.added < this.processColumnWidth(colName) / 2) {
+              this.columnsCache[colName].forEach(directive => directive.moveTo(-this.processColumnWidth(name), true));
+              this.swap(this.newOrder.indexOf(name), this.newOrder.indexOf(name) + 1);
+              this.added -= this.processColumnWidth(colName);
+            }
+          }
+        });
+
+      this.dropStream
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(({event, name}) => {
+          this.ngZone.run(() => {
+            this.drop.emit(this.newOrder);
+          });
+          this.added = 0;
+        });
+    });
   }
 
   private processColumnWidth(name: string) {
