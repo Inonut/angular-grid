@@ -20,6 +20,14 @@
       flex: 1;
       padding: 2px;
       border: 1px solid black;
+
+      &.isx-drag-column {
+        user-select: none;
+        pointer-events: none;
+      }
+      &:not(.isx-drag-column) {
+        transition: transform 0.2s ease;
+      }
     }
   }
 }

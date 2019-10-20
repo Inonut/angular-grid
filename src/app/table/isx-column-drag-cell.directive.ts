@@ -29,8 +29,16 @@ export class IsxColumnDragCellDirective implements OnInit, OnDestroy {
           filter(({name, event}) => name == this.matColumnDef.name)
         )
         .subscribe(({event}) => {
+          this.renderer.addClass(this.el.nativeElement, "isx-drag-column");
           this.moveTo(event.deltaX);
         });
+
+      this.isxColumnDragDirective.dropStream
+        .pipe(
+          takeUntil(this.unsubscribe),
+          filter(({name, event}) => name == this.matColumnDef.name)
+        )
+        .subscribe(({event}) => this.renderer.removeClass(this.el.nativeElement, "isx-drag-column"));
     });
   }
 
