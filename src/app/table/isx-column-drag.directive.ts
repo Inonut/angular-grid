@@ -20,22 +20,10 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
   @Input()
   set isxColumnDrag(val: string[]) {
     // @ts-ignore
-    val.push = (e) => {
-      Array.prototype.push.call(val, e);
+    ['pop', 'push', 'splice', 'unshift', 'shift', 'fill'].forEach(key => val[key] = (e) => {
+      Array.prototype[key].call(val, e);
       this.newOrder = val.slice();
-    };
-
-    // @ts-ignore
-    val.splice = (e) => {
-      Array.prototype.splice.call(val, e);
-      this.newOrder = val.slice();
-    };
-
-    // @ts-ignore
-    val.pop = (e) => {
-      Array.prototype.pop.call(val, e);
-      this.newOrder = val.slice();
-    };
+    });
 
     this.newOrder = val.slice();
   }

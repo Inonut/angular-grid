@@ -21,7 +21,7 @@ export class IsxColumnResizeHeaderDirective extends IsxColumnResizeCellDirective
 
     this.ngZone.runOutsideAngular(() => {
       let hammerEl = new HammerGestureConfig().buildHammer(resizeEl);
-      let initsize = this.el.nativeElement.clientWidth;
+      let initsize = 0;
       hammerEl.on("panstart", (event) => initsize = this.el.nativeElement.clientWidth);
       hammerEl.on("panleft", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.matColumnDef.name}));
       hammerEl.on("panright", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.matColumnDef.name}));
