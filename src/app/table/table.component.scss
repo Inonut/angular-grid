@@ -2,8 +2,13 @@
   display: flex;
   flex-direction: column;
 
-  .mat-header-row {
+  .mat-header-row,
+  .mat-header-cell {
     background: aquamarine;
+  }
+
+  .mat-cell {
+    background: white;
   }
 
   .mat-header-row,
