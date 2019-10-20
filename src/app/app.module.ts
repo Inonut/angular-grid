@@ -12,15 +12,25 @@ import {IsxVirtualScrollViewportContainerComponent} from './table/isx-virtual-sc
 import {IsxColumnDragDirective} from './table/isx-column-drag.directive';
 import {IsxColumnDragHeaderDirective} from './table/isx-column-drag-header.directive';
 import {IsxColumnDragCellDirective} from './table/isx-column-drag-cell.directive';
+import {IsxColumnResizeDirective} from './table/isx-column-resize.directive';
+import {IsxColumnResizeCellDirective} from './table/isx-column-resize-cell.directive';
+import {IsxColumnResizeHeaderDirective} from './table/isx-column-resize-header.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
+
     TableComponent,
+
     IsxVirtualScrollViewportContainerComponent,
+
     IsxColumnDragDirective,
     IsxColumnDragHeaderDirective,
-    IsxColumnDragCellDirective
+    IsxColumnDragCellDirective,
+
+    IsxColumnResizeDirective,
+    IsxColumnResizeHeaderDirective,
+    IsxColumnResizeCellDirective
   ],
   imports: [
     BrowserModule,

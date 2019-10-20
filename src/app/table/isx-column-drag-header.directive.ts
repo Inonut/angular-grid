@@ -10,8 +10,14 @@ export class IsxColumnDragHeaderDirective extends IsxColumnDragCellDirective imp
 
   ngOnInit(): void {
     super.ngOnInit();
+
+    let dragContainer = this.renderer.createElement("div");
+    this.renderer.addClass(dragContainer, "drag-column-container");
+    this.renderer.appendChild(this.el.nativeElement, dragContainer);
+    this.renderer.appendChild(dragContainer, this.el.nativeElement.firstChild);
+
     this.ngZone.runOutsideAngular(() => {
-      let hammerEl = new HammerGestureConfig().buildHammer(this.el.nativeElement);
+      let hammerEl = new HammerGestureConfig().buildHammer(dragContainer);
       hammerEl.on("panleft", (event) => this.isxColumnDragDirective.leftDragStream.next({event, name: this.matColumnDef.name}));
       hammerEl.on("panright", (event) => this.isxColumnDragDirective.rightDragStream.next({event, name: this.matColumnDef.name}));
       hammerEl.on("panend", (event) => this.isxColumnDragDirective.dropStream.next({event, name: this.matColumnDef.name}));

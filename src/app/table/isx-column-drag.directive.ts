@@ -53,7 +53,7 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
           if(this.newOrder.indexOf(name) != 0) {
             let colName = this.newOrder[this.newOrder.indexOf(name) - 1];
 
-            if(this.columnsCache[colName] && this.processColumnWidth(name) + event.deltaX + this.added < this.processColumnWidth(colName) / 2) {
+            if(this.columnsCache[colName] && -event.deltaX > this.processColumnWidth(colName) / 2 + this.added) {
               this.columnsCache[colName].forEach(directive => directive.moveTo(this.processColumnWidth(name), true));
               this.swap(this.newOrder.indexOf(name), this.newOrder.indexOf(name) - 1);
               this.added += this.processColumnWidth(colName);
@@ -67,7 +67,7 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
           if(this.newOrder.indexOf(name) != this.newOrder.length - 1) {
             let colName = this.newOrder[this.newOrder.indexOf(name) + 1];
 
-            if(this.columnsCache[colName] && this.processColumnWidth(name) - event.deltaX - this.added < this.processColumnWidth(colName) / 2) {
+            if(this.columnsCache[colName] && event.deltaX > this.processColumnWidth(colName) / 2 - this.added) {
               this.columnsCache[colName].forEach(directive => directive.moveTo(-this.processColumnWidth(name), true));
               this.swap(this.newOrder.indexOf(name), this.newOrder.indexOf(name) + 1);
               this.added -= this.processColumnWidth(colName);
@@ -88,7 +88,7 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
   }
 
   private processColumnWidth(name: string) {
-    if(name == null) {
+    if(name == null || this.columnsCache[name][0] == null) {
       return null;
     }
     return this.columnsCache[name][0].el.nativeElement.clientWidth;

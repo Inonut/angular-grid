@@ -8,15 +8,16 @@
   <cdk-virtual-scroll-viewport (scrolledIndexChange)="fetchNextPage($event)">
     <isx-table [dataSource]="isxVirtualScrollViewportContainer.scrolledDataSource"
                [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event"
-               matSort>
+               matSort
+               isxColumnResize>
       <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
         <ng-container *ngIf="column != 'name'">
-          <mat-header-cell *matHeaderCellDef mat-sort-header isx-column-drag-header> {{format(column)}} </mat-header-cell>
-          <mat-cell *matCellDef="let element" isx-column-drag-cell > {{element[column]}} </mat-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header isx-column-drag-header isx-column-resize-header [style.width.px]="60"> {{format(column)}} </mat-header-cell>
+          <mat-cell *matCellDef="let element" isx-column-drag-cell isx-column-resize-cell [style.width.px]="60"> {{element[column]}} </mat-cell>
         </ng-container>
         <ng-container *ngIf="column == 'name'">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> {{format(column)}} </mat-header-cell>
-          <mat-cell *matCellDef="let element" > {{element[column]}} </mat-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="60"> {{format(column)}} </mat-header-cell>
+          <mat-cell *matCellDef="let element" [style.width.px]="60"> {{element[column]}} </mat-cell>
         </ng-container>
       </ng-container>
 
