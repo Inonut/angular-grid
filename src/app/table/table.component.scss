@@ -11,6 +11,7 @@
     background: white;
   }
 
+  // important
   .mat-header-row,
   .mat-row {
     display: flex;
@@ -20,13 +21,34 @@
       flex: 1;
       padding: 2px;
       border: 1px solid black;
+      user-select: none;
 
       &.isx-drag-column {
-        user-select: none;
         pointer-events: none;
       }
       &:not(.isx-drag-column) {
         transition: transform 0.2s ease;
+      }
+    }
+
+    .mat-header-cell {
+      position: relative;
+
+      .resize-column-icon {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 5px;
+        height: 100%;
+
+        &:after {
+          content: "";
+          background: black;
+          position: absolute;
+          height: 100%;
+          width: 1px;
+          right: 0;
+        }
       }
     }
   }
