@@ -11,21 +11,17 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
   private unsubscribe = new Subject();
   leftDragStream = new Subject();
   rightDragStream = new Subject();
+  startDragStream = new Subject();
   dropStream = new Subject();
 
   private columnsCache: {[name: string]: Array<IsxColumnDragCellDirective>} = {};
   private newOrder = [];
+  private currentOrder = [];
   private added = 0;
 
   @Input()
   set isxColumnDrag(val: string[]) {
-    // @ts-ignore
-    ['pop', 'push', 'splice', 'unshift', 'shift', 'fill'].forEach(key => val[key] = (e) => {
-      Array.prototype[key].call(val, e);
-      this.newOrder = val.slice();
-    });
-
-    this.newOrder = val.slice();
+    this.currentOrder = val;
   }
 
   @Output() drop = new EventEmitter();
@@ -62,6 +58,10 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
             }
           }
         });
+
+      this.startDragStream
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(({event, name}) => this.newOrder = this.currentOrder.slice());
 
       this.dropStream
         .pipe(takeUntil(this.unsubscribe))

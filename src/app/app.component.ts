@@ -1,8 +1,9 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AppService} from './app.service';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {MatSort, MatTableDataSource} from '@angular/material';
+import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import {MatSort, MatTableDataSource} from '@angular/material';
 })
 export class AppComponent implements OnInit, OnDestroy {
   private unsubscribe = new Subject();
+  selectionModel = new SelectionModel();
 
   dataSource = new MatTableDataSource<PeriodicElement>();
 
@@ -19,7 +21,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatSort, {static: true}) matSort: MatSort;
 
-  constructor(private appService: AppService) {}
+  constructor(private appService: AppService,
+              private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.dataSource.sort = this.matSort;
@@ -70,6 +73,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   format(column: string) {
     return column.split("#####")[0];
+  }
+
+  select(row) {
+    this.selectionModel.select(row);
+    this.changeDetectorRef.detectChanges();
   }
 }
 

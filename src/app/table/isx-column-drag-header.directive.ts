@@ -18,6 +18,7 @@ export class IsxColumnDragHeaderDirective extends IsxColumnDragCellDirective imp
 
     this.ngZone.runOutsideAngular(() => {
       let hammerEl = new HammerGestureConfig().buildHammer(dragContainer);
+      hammerEl.on("panstart", (event) => this.isxColumnDragDirective.startDragStream.next({event, name: this.matColumnDef.name}));
       hammerEl.on("panleft", (event) => this.isxColumnDragDirective.leftDragStream.next({event, name: this.matColumnDef.name}));
       hammerEl.on("panright", (event) => this.isxColumnDragDirective.rightDragStream.next({event, name: this.matColumnDef.name}));
       hammerEl.on("panend", (event) => this.isxColumnDragDirective.dropStream.next({event, name: this.matColumnDef.name}));

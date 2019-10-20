@@ -36,6 +36,11 @@
     .mat-header-cell {
       position: relative;
 
+      .drag-column-container {
+        height: 100%;
+        width: 100%;
+      }
+
       .resize-column-icon {
         position: absolute;
         right: 0;
