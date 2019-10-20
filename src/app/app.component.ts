@@ -36,7 +36,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   addColumn() {
     const randomColumn = Math.floor(Math.random() * this.displayedColumns.length);
-    this.columnsToDisplay.push(this.displayedColumns[randomColumn]);
+    const newColumn = this.displayedColumns[randomColumn] + " ##### " + uuidv4();
+    this.dataSource.data.forEach(el => el[newColumn] = el[this.displayedColumns[randomColumn]]);
+    this.columnsToDisplay.push(newColumn);
   }
 
   removeColumn() {
@@ -65,6 +67,10 @@ export class AppComponent implements OnInit, OnDestroy {
         .subscribe((data) => this.dataSource.data = this.dataSource.data.concat(data));
     }
   }
+
+  format(column: string) {
+    return column.split("#####")[0];
+  }
 }
 
 
@@ -73,4 +79,12 @@ export interface PeriodicElement {
   position: number;
   weight: number;
   symbol: string;
+}
+
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
