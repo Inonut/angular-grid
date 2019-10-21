@@ -4,28 +4,24 @@
   <button mat-raised-button (click)="shuffle()"> Shuffle </button>
 </div>
 
-<isx-virtual-scroll-viewport-container [dataSource]="dataSource" #isxVirtualScrollViewportContainer=isxVirtualScrollViewportContainer [headerHeight]="20" [rowHeight]="22">
-  <cdk-virtual-scroll-viewport (scrolledIndexChange)="fetchNextPage($event)">
-    <isx-table [dataSource]="isxVirtualScrollViewportContainer.scrolledDataSource"
-               [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event"
-               matSort
-               isxColumnResize>
-      <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
-        <ng-container *ngIf="column != 'name'">
-          <mat-header-cell *matHeaderCellDef mat-sort-header isx-column-drag-header isx-column-resize-header [style.width.px]="100"> {{format(column)}} </mat-header-cell>
-          <mat-cell *matCellDef="let element" isx-column-drag-cell isx-column-resize-cell [style.width.px]="100"> {{element[column]}} </mat-cell>
-        </ng-container>
-        <ng-container *ngIf="column == 'name'">
-          <mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="60"> {{format(column)}} - no drag </mat-header-cell>
-          <mat-cell *matCellDef="let element" [style.width.px]="60"> {{element[column]}} </mat-cell>
-        </ng-container>
-      </ng-container>
+<isx-table #isxTable [originalDataSource]="dataSource" (fetchNextPage)="fetchNextPage($event)"
+           [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event"
+           matSort
+           isxColumnResize>
+  <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
+    <ng-container *ngIf="column != 'name'">
+      <mat-header-cell *matHeaderCellDef mat-sort-header isx-column-drag-header isx-column-resize-header [style.width.px]="100"> {{format(column)}} </mat-header-cell>
+      <mat-cell *matCellDef="let element" isx-column-drag-cell isx-column-resize-cell [style.width.px]="100"> {{element[column]}} </mat-cell>
+    </ng-container>
+    <ng-container *ngIf="column == 'name'">
+      <mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="60"> {{format(column)}} - no drag </mat-header-cell>
+      <mat-cell *matCellDef="let element" [style.width.px]="60"> {{element[column]}} </mat-cell>
+    </ng-container>
+  </ng-container>
 
-      <mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true" [style.top.px]="-isxVirtualScrollViewportContainer.getOffsetToRenderedContentStart()"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
 
-      <ng-template let-row matRowDef cdkVirtualFor [matRowDefColumns]="columnsToDisplay" [cdkVirtualForOf]="isxVirtualScrollViewportContainer.dataSource">
-        <mat-row (click)="select(row)" [class.selected]="selectionModel.isSelected(row)"></mat-row>
-      </ng-template>
-    </isx-table>
-  </cdk-virtual-scroll-viewport>
-</isx-virtual-scroll-viewport-container>
+  <ng-template let-row matRowDef [matRowDefColumns]="columnsToDisplay" isxVirtualFor [isxVirtualForOf]="isxTable.originalDataSource">
+    <mat-row (click)="select(row)" [class.selected]="selectionModel.isSelected(row)"></mat-row>
+  </ng-template>
+</isx-table>

@@ -12,7 +12,7 @@ import {
 import {MatTableDataSource} from '@angular/material';
 import {VIRTUAL_SCROLL_STRATEGY} from '@angular/cdk/scrolling';
 import {TableVirtualScrollStrategy} from './table-vs-strategy';
-import {combineLatest, fromEvent, Subject} from 'rxjs';
+import {combineLatest, fromEvent, merge, Subject} from 'rxjs';
 import {startWith, takeUntil, tap} from 'rxjs/operators';
 
 @Component({
@@ -32,16 +32,28 @@ import {startWith, takeUntil, tap} from 'rxjs/operators';
 })
 export class IsxVirtualScrollViewportContainerComponent implements AfterViewInit, OnDestroy {
   private unsubscribe = new Subject();
+  private updateStream = new Subject();
 
   private range = 0;
+  private _rowHeight = 30;
+  private _headerHeight = 32;
 
-  scrolledDataSource = new MatTableDataSource();
-
+  scrolledDataSource = new MatTableDataSource<any>();
   @Input() dataSource: MatTableDataSource<any>;
-  @Input() rowHeight = 30;
-  @Input() headerHeight = 32;
 
-  constructor(@Inject(VIRTUAL_SCROLL_STRATEGY) private readonly scrollStrategy: TableVirtualScrollStrategy,
+  @Input()
+  set rowHeight(val: number) {
+    this._rowHeight = val;
+    this.updateStream.next();
+  }
+
+  @Input()
+  set headerHeight(val: number) {
+    this._headerHeight = val;
+    this.updateStream.next();
+  }
+
+  constructor(@Inject(VIRTUAL_SCROLL_STRATEGY) public readonly scrollStrategy: TableVirtualScrollStrategy,
               private changeDetectorRef: ChangeDetectorRef,
               protected ngZone: NgZone,
               public renderer: Renderer2,
@@ -49,15 +61,15 @@ export class IsxVirtualScrollViewportContainerComponent implements AfterViewInit
 
   ngAfterViewInit(): void {
     this.ngZone.runOutsideAngular(() => {
-      let resizeStream = fromEvent(window, 'resize')
+      let resizeStream = merge(fromEvent(window, 'resize'), this.updateStream)
         .pipe(
           startWith(null),
           takeUntil(this.unsubscribe),
           tap(() => {
             let gridHeight= this.el.nativeElement.clientHeight;
 
-            this.range = Math.ceil(gridHeight / this.rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE;
-            this.scrollStrategy.setScrollHeight(this.rowHeight, this.headerHeight);
+            this.range = Math.ceil(gridHeight / this._rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE / 2;
+            this.scrollStrategy.setScrollHeight(this._rowHeight, this._headerHeight);
           })
         );
 

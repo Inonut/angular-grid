@@ -12,6 +12,11 @@
   }
 
   // important
+
+  .cdk-virtual-scroll-viewport {
+    flex: 1;
+  }
+
   .mat-header-row,
   .mat-row {
     display: flex;

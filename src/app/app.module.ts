@@ -8,13 +8,14 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material';
 import {DemoMaterialModule} from './material.module';
 import { TableComponent } from './table/table.component';
-import {IsxVirtualScrollViewportContainerComponent} from './table/isx-virtual-scroll-viewport-container.component';
 import {IsxColumnDragDirective} from './table/isx-column-drag.directive';
 import {IsxColumnDragHeaderDirective} from './table/isx-column-drag-header.directive';
 import {IsxColumnDragCellDirective} from './table/isx-column-drag-cell.directive';
 import {IsxColumnResizeDirective} from './table/isx-column-resize.directive';
 import {IsxColumnResizeCellDirective} from './table/isx-column-resize-cell.directive';
 import {IsxColumnResizeHeaderDirective} from './table/isx-column-resize-header.directive';
+import {IsxVirtualForDirective} from './table/isx-virtual-for.directive';
+import {IsxVirtualScrollViewportContainerComponent} from './table/isx-virtual-scroll-viewport-container.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,9 @@ import {IsxColumnResizeHeaderDirective} from './table/isx-column-resize-header.d
 
     IsxColumnResizeDirective,
     IsxColumnResizeHeaderDirective,
-    IsxColumnResizeCellDirective
+    IsxColumnResizeCellDirective,
+
+    IsxVirtualForDirective
   ],
   imports: [
     BrowserModule,
