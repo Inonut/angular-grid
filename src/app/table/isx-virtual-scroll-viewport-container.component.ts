@@ -5,8 +5,8 @@ import {
   Component,
   ElementRef,
   Inject,
-  Input,
-  OnDestroy,
+  Input, NgZone,
+  OnDestroy, Renderer2,
   ViewEncapsulation
 } from '@angular/core';
 import {MatTableDataSource} from '@angular/material';
@@ -43,34 +43,37 @@ export class IsxVirtualScrollViewportContainerComponent implements AfterViewInit
 
   constructor(@Inject(VIRTUAL_SCROLL_STRATEGY) private readonly scrollStrategy: TableVirtualScrollStrategy,
               private changeDetectorRef: ChangeDetectorRef,
+              protected ngZone: NgZone,
+              public renderer: Renderer2,
               private el: ElementRef) {}
 
   ngAfterViewInit(): void {
-    let resizeStream = fromEvent(window, 'resize')
-      .pipe(
-        startWith(null),
-        takeUntil(this.unsubscribe),
-        tap(() => {
-          let gridHeight= this.el.nativeElement.clientHeight;
+    this.ngZone.runOutsideAngular(() => {
+      let resizeStream = fromEvent(window, 'resize')
+        .pipe(
+          startWith(null),
+          takeUntil(this.unsubscribe),
+          tap(() => {
+            let gridHeight= this.el.nativeElement.clientHeight;
 
-          this.range = Math.ceil(gridHeight / this.rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE;
-          this.scrollStrategy.setScrollHeight(this.rowHeight, this.headerHeight);
-        })
-      );
+            this.range = Math.ceil(gridHeight / this.rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE;
+            this.scrollStrategy.setScrollHeight(this.rowHeight, this.headerHeight);
+          })
+        );
 
-    combineLatest([this.dataSource.connect(), this.scrollStrategy.scrolledIndexChange, resizeStream])
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(([data, scrolledindex]) => {
+      combineLatest([this.dataSource.connect(), this.scrollStrategy.scrolledIndexChange, resizeStream])
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(([data, scrolledindex]) => {
 
-        // Determine the start and end rendered range
-        const start = Math.max(0, scrolledindex - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
-        const end = Math.min(data.length, scrolledindex + this.range);
+          // Determine the start and end rendered range
+          const start = Math.max(0, scrolledindex - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
+          const end = Math.min(data.length, scrolledindex + this.range);
 
-        console.log(start, end);
-        // Update the datasource for the rendered range of data
-        // return value[0].slice(start, end);
-        this.scrolledDataSource.data = data.slice(start, end);
-      });
+          // Update the datasource for the rendered range of data
+          // return value[0].slice(start, end);
+          this.scrolledDataSource.data = data.slice(start, end);
+        });
+    });
   }
 
   ngOnDestroy(): void {
