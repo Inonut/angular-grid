@@ -92,16 +92,16 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
   }
 
   add(directive: IsxColumnDragCellDirective) {
-    this.columnsCache[directive.matColumnDef.name] = this.columnsCache[directive.matColumnDef.name] || [];
-    this.columnsCache[directive.matColumnDef.name].push(directive);
+    this.columnsCache[directive.name] = this.columnsCache[directive.name] || [];
+    this.columnsCache[directive.name].push(directive);
   }
 
   remove(directive: IsxColumnDragCellDirective) {
-    this.columnsCache[directive.matColumnDef.name] = this.columnsCache[directive.matColumnDef.name] || [];
-    this.columnsCache[directive.matColumnDef.name].splice(this.columnsCache[directive.matColumnDef.name].indexOf(directive), 1);
+    this.columnsCache[directive.name] = this.columnsCache[directive.name] || [];
+    this.columnsCache[directive.name].splice(this.columnsCache[directive.name].indexOf(directive), 1);
 
-    if(this.columnsCache[directive.matColumnDef.name].length == 0) {
-      delete this.columnsCache[directive.matColumnDef.name];
+    if(this.columnsCache[directive.name].length == 0) {
+      delete this.columnsCache[directive.name];
     }
   }
 }

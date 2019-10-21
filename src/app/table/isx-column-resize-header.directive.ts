@@ -12,6 +12,12 @@ import {HammerGestureConfig} from '@angular/platform-browser';
   exportAs: 'isxColumnResizeHeader',
 })
 export class IsxColumnResizeHeaderDirective extends IsxColumnResizeCellDirective implements OnInit, OnDestroy {
+
+  @Input('isx-column-resize-header')
+  set columnName(name: string) {
+    this.name = name || this.matColumnDef.name;
+  }
+
   ngOnInit(): void {
     super.ngOnInit();
 
@@ -23,9 +29,9 @@ export class IsxColumnResizeHeaderDirective extends IsxColumnResizeCellDirective
       let hammerEl = new HammerGestureConfig().buildHammer(resizeEl);
       let initsize = 0;
       hammerEl.on("panstart", (event) => initsize = this.el.nativeElement.clientWidth);
-      hammerEl.on("panleft", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.matColumnDef.name}));
-      hammerEl.on("panright", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.matColumnDef.name}));
-      hammerEl.on("panend", (event) => this.isxColumnResizeDirective.endResizeStream.next({size: initsize + event.deltaX, name: this.matColumnDef.name}));
+      hammerEl.on("panleft", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.name}));
+      hammerEl.on("panright", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.name}));
+      hammerEl.on("panend", (event) => this.isxColumnResizeDirective.endResizeStream.next({size: initsize + event.deltaX, name: this.name}));
     });
   }
 }

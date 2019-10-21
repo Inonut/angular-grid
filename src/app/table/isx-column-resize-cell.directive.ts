@@ -12,6 +12,12 @@ import {IsxColumnResizeDirective} from './isx-column-resize.directive';
 })
 export class IsxColumnResizeCellDirective implements OnInit, OnDestroy {
   private unsubscribe = new Subject();
+  name: string;
+
+  @Input('isx-column-resize-cell')
+  set columnName(name: string) {
+    this.name = name || this.matColumnDef.name;
+  }
 
   constructor(@Optional() protected isxColumnResizeDirective: IsxColumnResizeDirective,
               @Optional() public matColumnDef: MatColumnDef,
@@ -25,7 +31,7 @@ export class IsxColumnResizeCellDirective implements OnInit, OnDestroy {
     this.isxColumnResizeDirective.resizeStream
       .pipe(
         takeUntil(this.unsubscribe),
-        filter(({name, size}) => name == this.matColumnDef.name)
+        filter(({name, size}) => name == this.name)
       )
       .subscribe(({size}) => {
         this.renderer.addClass(this.el.nativeElement, "isx-resize-column");
@@ -35,7 +41,7 @@ export class IsxColumnResizeCellDirective implements OnInit, OnDestroy {
     this.isxColumnResizeDirective.endResizeStream
       .pipe(
         takeUntil(this.unsubscribe),
-        filter(({name, event}) => name == this.matColumnDef.name)
+        filter(({name, event}) => name == this.name)
       )
       .subscribe(({event}) => this.renderer.removeClass(this.el.nativeElement, "isx-resize-column"));
   }

@@ -2,6 +2,7 @@
   <button mat-raised-button (click)="addColumn()"> Add column </button>
   <button mat-raised-button (click)="removeColumn()"> Remove column </button>
   <button mat-raised-button (click)="shuffle()"> Shuffle </button>
+  <button mat-raised-button (click)="toggleFilter = !toggleFilter">Toggle filter</button>
 </div>
 
 <isx-table #isxTable [originalDataSource]="dataSource" (fetchNextPage)="fetchNextPage($event)"
@@ -19,7 +20,17 @@
     </ng-container>
   </ng-container>
 
+  <ng-container [matColumnDef]="column" *ngFor="let column of filteredColumnsToDisplay">
+    <ng-container *ngIf="column != 'filter_name'">
+      <mat-header-cell *matHeaderCellDef [isx-column-drag-cell]="parentHeader(column)" [isx-column-resize-cell]="parentHeader(column)" [style.width.px]="100"> {{format(column)}} </mat-header-cell>
+    </ng-container>
+    <ng-container *ngIf="column == 'filter_name'">
+      <mat-header-cell *matHeaderCellDef [style.width.px]="60"></mat-header-cell>
+    </ng-container>
+  </ng-container>
+
   <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="filteredColumnsToDisplay" [class.hidden]="!toggleFilter"></mat-header-row>
 
   <ng-template let-row matRowDef [matRowDefColumns]="columnsToDisplay" isxVirtualFor [isxVirtualForOf]="isxTable.originalDataSource">
     <mat-row (click)="select(row)" [class.selected]="selectionModel.isSelected(row)"></mat-row>

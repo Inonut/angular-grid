@@ -13,6 +13,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 export class AppComponent implements OnInit, OnDestroy {
   private unsubscribe = new Subject();
   selectionModel = new SelectionModel();
+  toggleFilter = false;
 
   dataSource = new MatTableDataSource<PeriodicElement>();
 
@@ -78,6 +79,14 @@ export class AppComponent implements OnInit, OnDestroy {
   select(row) {
     this.selectionModel.select(row);
     this.changeDetectorRef.detectChanges();
+  }
+
+  parentHeader(columnName: string) {
+    return columnName.replace('filter_', '');
+  }
+
+  get filteredColumnsToDisplay() {
+    return this.columnsToDisplay.map(el => 'filter_' + el);
   }
 }
 

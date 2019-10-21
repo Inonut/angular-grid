@@ -1,4 +1,4 @@
-import {Directive, OnDestroy, OnInit} from '@angular/core';
+import {Directive, Input, OnDestroy, OnInit} from '@angular/core';
 import {HammerGestureConfig} from '@angular/platform-browser';
 import {IsxColumnDragCellDirective} from './isx-column-drag-cell.directive';
 
@@ -7,6 +7,11 @@ import {IsxColumnDragCellDirective} from './isx-column-drag-cell.directive';
   exportAs: 'isxColumnDragHeader',
 })
 export class IsxColumnDragHeaderDirective extends IsxColumnDragCellDirective implements OnInit, OnDestroy {
+
+  @Input('isx-column-drag-header')
+  set columnName(name: string) {
+    this.name = name || this.matColumnDef.name;
+  }
 
   ngOnInit(): void {
     super.ngOnInit();
@@ -18,10 +23,10 @@ export class IsxColumnDragHeaderDirective extends IsxColumnDragCellDirective imp
 
     this.ngZone.runOutsideAngular(() => {
       let hammerEl = new HammerGestureConfig().buildHammer(dragContainer);
-      hammerEl.on("panstart", (event) => this.isxColumnDragDirective.startDragStream.next({event, name: this.matColumnDef.name}));
-      hammerEl.on("panleft", (event) => this.isxColumnDragDirective.leftDragStream.next({event, name: this.matColumnDef.name}));
-      hammerEl.on("panright", (event) => this.isxColumnDragDirective.rightDragStream.next({event, name: this.matColumnDef.name}));
-      hammerEl.on("panend", (event) => this.isxColumnDragDirective.dropStream.next({event, name: this.matColumnDef.name}));
+      hammerEl.on("panstart", (event) => this.isxColumnDragDirective.startDragStream.next({event, name: this.name}));
+      hammerEl.on("panleft", (event) => this.isxColumnDragDirective.leftDragStream.next({event, name: this.name}));
+      hammerEl.on("panright", (event) => this.isxColumnDragDirective.rightDragStream.next({event, name: this.name}));
+      hammerEl.on("panend", (event) => this.isxColumnDragDirective.dropStream.next({event, name: this.name}));
     });
   }
 }

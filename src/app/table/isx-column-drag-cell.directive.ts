@@ -1,4 +1,4 @@
-import {AfterViewChecked, Directive, ElementRef, HostBinding, NgZone, OnDestroy, OnInit, Optional, Renderer2} from '@angular/core';
+import {AfterViewChecked, Directive, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, Optional, Renderer2} from '@angular/core';
 import {fromEvent, merge, Subject} from 'rxjs';
 import {IsxColumnDragDirective} from './isx-column-drag.directive';
 import {MatColumnDef} from '@angular/material';
@@ -11,6 +11,12 @@ import {filter, takeUntil} from 'rxjs/operators';
 })
 export class IsxColumnDragCellDirective implements OnInit, OnDestroy {
   protected unsubscribe = new Subject();
+  name: string;
+
+  @Input('isx-column-drag-cell')
+  set columnName(name: string) {
+    this.name = name || this.matColumnDef.name;
+  }
 
   constructor(@Optional() protected isxColumnDragDirective: IsxColumnDragDirective,
               @Optional() public matColumnDef: MatColumnDef,
@@ -26,7 +32,7 @@ export class IsxColumnDragCellDirective implements OnInit, OnDestroy {
       merge(this.isxColumnDragDirective.leftDragStream, this.isxColumnDragDirective.rightDragStream)
         .pipe(
           takeUntil(this.unsubscribe),
-          filter(({name, event}) => name == this.matColumnDef.name)
+          filter(({name, event}) => name == this.name)
         )
         .subscribe(({event}) => {
           this.renderer.addClass(this.el.nativeElement, "isx-drag-column");
@@ -36,7 +42,7 @@ export class IsxColumnDragCellDirective implements OnInit, OnDestroy {
       this.isxColumnDragDirective.dropStream
         .pipe(
           takeUntil(this.unsubscribe),
-          filter(({name, event}) => name == this.matColumnDef.name)
+          filter(({name, event}) => name == this.name)
         )
         .subscribe(({event}) => this.renderer.removeClass(this.el.nativeElement, "isx-drag-column"));
     });
