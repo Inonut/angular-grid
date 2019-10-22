@@ -6,7 +6,7 @@ import { distinctUntilChanged } from 'rxjs/operators';
 @Injectable()
 export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
-  static BUFFER_SIZE = 40;
+  static BUFFER_SIZE = 10;
 
   private scrollHeight!: number;
   private scrollHeader!: number;

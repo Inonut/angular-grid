@@ -22,14 +22,7 @@ import {IsxVirtualScrollViewportComponent} from './isx-virtual-scroll-viewport.c
 })
 export class IsxVirtualForDirective<T> implements CollectionViewer, DoCheck, OnDestroy, AfterViewInit {
 
-  private dataSource: DataSource<T>;
   private virtualForDirective: CdkVirtualForOf<T>;
-  private _isxVirtualForOf: DataSource<T> | Observable<T[]> | NgIterable<T> | null | undefined;
-
-  @Input()
-  set isxVirtualForOf(value: DataSource<T> | Observable<T[]> | NgIterable<T> | null | undefined) {
-    this._isxVirtualForOf = value;
-  }
 
   constructor(private changeDetectorRef: ChangeDetectorRef,
               private _viewContainerRef: ViewContainerRef,
@@ -43,7 +36,7 @@ export class IsxVirtualForDirective<T> implements CollectionViewer, DoCheck, OnD
 
   ngAfterViewInit(): void {
     this.virtualForDirective = new CdkVirtualForOf<T>(this._viewContainerRef, this._template, this._differs, this.viewScroll.viewPort, this.ngZone);
-    this.virtualForDirective.cdkVirtualForOf = this._isxVirtualForOf;
+    this.virtualForDirective.cdkVirtualForOf = this.viewScroll.origDataSource;
   }
 
   ngDoCheck(): void {

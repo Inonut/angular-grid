@@ -14,15 +14,12 @@ import {IsxColumnResizeDirective} from './table/isx-column-resize.directive';
 import {IsxColumnResizeCellDirective} from './table/isx-column-resize-cell.directive';
 import {IsxColumnResizeHeaderDirective} from './table/isx-column-resize-header.directive';
 import {IsxVirtualForDirective} from './table/isx-virtual-for.directive';
-import {IsxVirtualScrollViewportContainerComponent} from './table/isx-virtual-scroll-viewport-container.component';
 import {IsxVirtualScrollViewportComponent} from './table/isx-virtual-scroll-viewport.component';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 
 @NgModule({
   declarations: [
     AppComponent,
-
-    IsxVirtualScrollViewportContainerComponent,
 
     IsxColumnDragDirective,
     IsxColumnDragHeaderDirective,
