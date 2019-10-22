@@ -25,6 +25,7 @@ import {TableVirtualScrollStrategy} from './isx-virtual-scroll-viewport.service'
 
 @Directive({
   selector: '[isxVirtualScrollViewport]',
+  exportAs: 'isxVirtualScrollViewport',
   providers: [{
     provide: VIRTUAL_SCROLL_STRATEGY,
     useClass: TableVirtualScrollStrategy,
@@ -34,10 +35,11 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
   private unsubscribe = new Subject();
   private updateStream = new Subject();
 
+  private scrollTop = 0;
+
   viewPort: CdkVirtualScrollViewport;
 
   private range = 0;
-  private _rowHeight = 55;
 
   scrolledDataSource = new MatTableDataSource<T>();
   origDataSource = new MatTableDataSource<T>();
@@ -47,6 +49,8 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
     this.host.dataSource = this.scrolledDataSource;
     this.origDataSource = source;
   }
+
+  @Input() rowHeight = 55;
 
   constructor(private changeDetectorRef: ChangeDetectorRef,
               private _viewContainerRef: ViewContainerRef,
@@ -81,8 +85,8 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
           tap(() => {
             let gridHeight = this.viewPort.elementRef.nativeElement.clientHeight;
 
-            this.range = Math.ceil(gridHeight / this._rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE / 2;
-            this.scrollStrategy.setScrollHeight(this._rowHeight);
+            this.range = Math.ceil(gridHeight / this.rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE / 2;
+            this.scrollStrategy.setScrollHeight(this.rowHeight);
           })
         );
 
@@ -100,20 +104,33 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
 
       fromEvent(this.viewPort.elementRef.nativeElement, 'scroll')
         .pipe(takeUntil(this.unsubscribe))
-        .subscribe((event) => this.updateHeaderAndFooterScroll());
+        .subscribe((event) => {
+          this.scrollTop = this.viewPort.elementRef.nativeElement.scrollTop;
+          this.updateHeaderAndFooterScroll()
+        });
+
+      this.scrollTop = this.viewPort.elementRef.nativeElement.scrollTop;
     });
   }
 
 
   ngAfterContentChecked(): void {
-    this.updateHeaderAndFooterScroll()
+    this.updateHeaderAndFooterScroll();
+    this.viewPort.elementRef.nativeElement.scrollTop = this.scrollTop;
+  }
+
+  private updateRow(className: string) {
+    Array.from<Element>(this.el.nativeElement.getElementsByClassName(className))
+      .forEach(el => el.scrollLeft = this.viewPort.elementRef.nativeElement.scrollLeft);
   }
 
   updateHeaderAndFooterScroll() {
-    Array.from<Element>(this.el.nativeElement.getElementsByClassName('mat-header-row'))
-      .forEach(el => el.scrollLeft = this.viewPort.elementRef.nativeElement.scrollLeft);
-    Array.from<Element>(this.el.nativeElement.getElementsByClassName('mat-footer-row'))
-      .forEach(el => el.scrollLeft = this.viewPort.elementRef.nativeElement.scrollLeft);
+    setTimeout(() => {
+      this.ngZone.runOutsideAngular(() => {
+        this.updateRow('mat-header-row');
+        this.updateRow('mat-footer-row');
+      })
+    });
   }
 
   ngOnDestroy(): void {

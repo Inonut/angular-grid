@@ -2,13 +2,13 @@
   <button mat-raised-button (click)="addColumn()"> Add column </button>
   <button mat-raised-button (click)="removeColumn()"> Remove column </button>
   <button mat-raised-button (click)="shuffle()"> Shuffle </button>
-  <button mat-raised-button (click)="toggleFilter = !toggleFilter">Toggle filter</button>
+  <button mat-raised-button (click)="toggleFilter = !toggleFilter; vewScroll.updateHeaderAndFooterScroll()">Toggle filter</button>
 </div>
 
 <mat-table [dataSource]="dataSource"
            [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event"
            matSort
-           isxVirtualScrollViewport
+           isxVirtualScrollViewport #vewScroll=isxVirtualScrollViewport
            isxColumnResize (resize)="console($event)">
 
   <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
