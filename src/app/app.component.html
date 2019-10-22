@@ -5,10 +5,12 @@
   <button mat-raised-button (click)="toggleFilter = !toggleFilter">Toggle filter</button>
 </div>
 
-<isx-table #isxTable [originalDataSource]="dataSource" (fetchNextPage)="fetchNextPage($event)"
+<mat-table #isxTable [dataSource]="dataSource"
            [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event"
            matSort
-           isxColumnResize>
+           isxVirtualScrollViewport
+           isxColumnResize (resize)="console($event)">
+
   <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
     <ng-container *ngIf="column != 'name'">
       <mat-header-cell *matHeaderCellDef mat-sort-header isx-column-drag-header isx-column-resize-header [style.width.px]="100"> {{format(column)}} </mat-header-cell>
@@ -32,7 +34,7 @@
   <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
   <mat-header-row *matHeaderRowDef="filteredColumnsToDisplay" [class.hidden]="!toggleFilter"></mat-header-row>
 
-  <ng-template let-row matRowDef [matRowDefColumns]="columnsToDisplay" isxVirtualFor [isxVirtualForOf]="isxTable.originalDataSource">
+  <ng-template let-row matRowDef [matRowDefColumns]="columnsToDisplay" isxVirtualFor [isxVirtualForOf]="dataSource">
     <mat-row (click)="select(row)" [class.selected]="selectionModel.isSelected(row)"></mat-row>
   </ng-template>
-</isx-table>
+</mat-table>

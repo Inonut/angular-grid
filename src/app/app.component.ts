@@ -85,6 +85,10 @@ export class AppComponent implements OnInit, OnDestroy {
     return columnName.replace('filter_', '');
   }
 
+  console($event: any) {
+    console.log($event)
+  }
+
   get filteredColumnsToDisplay() {
     return this.columnsToDisplay.map(el => 'filter_' + el);
   }
