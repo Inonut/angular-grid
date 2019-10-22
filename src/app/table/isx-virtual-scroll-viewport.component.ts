@@ -5,14 +5,14 @@ import {
   ChangeDetectorRef,
   ComponentFactoryResolver,
   Directive,
-  ElementRef,
+  ElementRef, EventEmitter,
   Host,
   Inject,
   Input,
   IterableDiffers,
   NgZone,
   OnDestroy,
-  OnInit,
+  OnInit, Output,
   Renderer2,
   ViewContainerRef
 } from '@angular/core';
@@ -51,6 +51,8 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
   }
 
   @Input() rowHeight = 55;
+
+  @Output() fetchNextPage = new EventEmitter();
 
   constructor(private changeDetectorRef: ChangeDetectorRef,
               private _viewContainerRef: ViewContainerRef,
@@ -111,6 +113,10 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
 
       this.scrollTop = this.viewPort.elementRef.nativeElement.scrollTop;
     });
+
+    this.viewPort.scrolledIndexChange
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(val => this.fetchNextPage.next(val));
   }
 
 

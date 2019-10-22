@@ -6,9 +6,9 @@
 </div>
 
 <mat-table [dataSource]="dataSource"
-           [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event"
+           [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event; console($event)"
            matSort
-           isxVirtualScrollViewport #vewScroll=isxVirtualScrollViewport
+           isxVirtualScrollViewport #vewScroll=isxVirtualScrollViewport (fetchNextPage)="fetchNextPage($event)"
            isxColumnResize (resize)="console($event)">
 
   <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
