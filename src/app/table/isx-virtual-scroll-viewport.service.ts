@@ -9,7 +9,6 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   static BUFFER_SIZE = 10;
 
   private scrollHeight!: number;
-  private scrollHeader!: number;
   private readonly indexChange = new Subject<number>();
 
   private viewport: CdkVirtualScrollViewport;
@@ -52,9 +51,8 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
     // no-op
   }
 
-  public setScrollHeight(rowHeight: number, headerHeight: number) {
+  public setScrollHeight(rowHeight: number) {
     this.scrollHeight = rowHeight;
-    this.scrollHeader = headerHeight;
     this.updateContent(this.viewport);
   }
 
@@ -68,9 +66,9 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
   private updateContent(viewport: CdkVirtualScrollViewport) {
     if (this.viewport) {
-      const newIndex = Math.max(0, Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
+      const newIndex = Math.max(0, Math.round(viewport.measureScrollOffset() / this.scrollHeight) - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
       viewport.setRenderedContentOffset(this.scrollHeight * newIndex);
-      this.indexChange.next(Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) + 1);
+      this.indexChange.next(Math.round(viewport.measureScrollOffset() / this.scrollHeight) + 1);
     }
   }
 }

@@ -38,7 +38,6 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
 
   private range = 0;
   private _rowHeight = 55;
-  private _headerHeight = 63;
 
   scrolledDataSource = new MatTableDataSource<T>();
   origDataSource = new MatTableDataSource<T>();
@@ -66,7 +65,6 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
     let cdkVirtualScrollViewportRef = portal.attachComponentPortal(cdkVirtualScrollViewport);
     this.renderer.appendChild(this.el.nativeElement, cdkVirtualScrollViewportRef.location.nativeElement);
     this.renderer.appendChild(cdkVirtualScrollViewportRef.instance._contentWrapper.nativeElement, this.host._rowOutlet.elementRef.nativeElement);
-    // this.renderer.appendChild(cdkVirtualScrollViewportRef.instance._contentWrapper.nativeElement, this.el.nativeElement);
 
     this.viewPort = cdkVirtualScrollViewportRef.instance;
   }
@@ -81,11 +79,10 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
           startWith(null),
           takeUntil(this.unsubscribe),
           tap(() => {
-            // let gridHeight= this.el.nativeElement.clientHeight;
             let gridHeight = this.viewPort.elementRef.nativeElement.clientHeight;
 
             this.range = Math.ceil(gridHeight / this._rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE / 2;
-            this.scrollStrategy.setScrollHeight(this._rowHeight, this._headerHeight);
+            this.scrollStrategy.setScrollHeight(this._rowHeight);
           })
         );
 
@@ -97,8 +94,6 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
           const start = Math.max(0, scrolledindex - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
           const end = Math.min(data.length, scrolledindex + this.range);
 
-          // Update the datasource for the rendered range of data
-          // return value[0].slice(start, end);
           this.scrolledDataSource.data = data.slice(start, end);
           this.changeDetectorRef.detectChanges();
         });
