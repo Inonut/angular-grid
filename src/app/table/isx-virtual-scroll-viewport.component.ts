@@ -109,6 +109,7 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
     });
   }
 
+
   ngAfterContentChecked(): void {
     this.updateHeaderAndFooterScroll()
   }
