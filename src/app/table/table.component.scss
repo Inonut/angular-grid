@@ -1,6 +1,8 @@
 .mat-table {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow: auto;
 
   .mat-header-row,
   .mat-header-cell {

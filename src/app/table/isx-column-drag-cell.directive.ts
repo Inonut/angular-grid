@@ -1,4 +1,16 @@
-import {AfterViewChecked, Directive, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, Optional, Renderer2} from '@angular/core';
+import {
+  AfterViewChecked,
+  ChangeDetectorRef,
+  Directive,
+  ElementRef,
+  HostBinding,
+  Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  Optional,
+  Renderer2
+} from '@angular/core';
 import {fromEvent, merge, Subject} from 'rxjs';
 import {IsxColumnDragDirective} from './isx-column-drag.directive';
 import {MatColumnDef} from '@angular/material';
