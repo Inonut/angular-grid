@@ -2,9 +2,10 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, NgZon
 import {AppService} from './app.service';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
-import {MatSort, MatTableDataSource} from '@angular/material';
-import {TableSelectionModel} from './table/table-selection.model';
+import {MatSort} from '@angular/material';
 import {IsxVirtualScrollViewportComponent} from './table/isx-virtual-scroll-viewport.component';
+import {IsxTableDataSource} from './table/isx-table-data-source.model';
+import {IsxSelectionModel} from './table/selection.model';
 
 @Component({
   selector: 'app-root',
@@ -15,9 +16,8 @@ import {IsxVirtualScrollViewportComponent} from './table/isx-virtual-scroll-view
 export class AppComponent implements OnInit, OnDestroy {
   private unsubscribe = new Subject();
 
-  dataSource = new MatTableDataSource<PeriodicElement>();
-
-  selectionModel = new TableSelectionModel<PeriodicElement>(true).withData(this.dataSource.data);
+  selectionModel = new IsxSelectionModel<PeriodicElement>(true);
+  dataSource = new IsxTableDataSource<PeriodicElement>().withSelectionModel(this.selectionModel);
   toggleFilter = false;
 
   displayedColumns: string[] = ['name', 'weight', 'symbol', 'position'];
@@ -37,10 +37,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.appService.fetchData()
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((data) => this.dataSource.data = data);
-
-    this.dataSource.connect()
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe((data) => this.selectionModel.withData(data));
 
     new Array(16).fill(0).forEach(() => this.addColumn());
   }

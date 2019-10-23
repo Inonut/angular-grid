@@ -35,7 +35,6 @@ import {TableVirtualScrollStrategy} from './isx-virtual-scroll-viewport.service'
 })
 export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterViewInit, OnInit, AfterContentInit, AfterContentChecked {
   private unsubscribe = new Subject();
-  private updateGridStream = new Subject();
   resetDataSourceStream = new ReplaySubject<MatTableDataSource<T>>(1);
 
   private scrollTop = 0;
@@ -89,7 +88,7 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
 
   ngAfterViewInit(): void {
     this.ngZone.runOutsideAngular(() => {
-      let resizeStream = merge(fromEvent(window, 'resize'), this.updateGridStream)
+      let resizeStream = fromEvent(window, 'resize')
         .pipe(
           startWith(null),
           takeUntil(this.unsubscribe),
