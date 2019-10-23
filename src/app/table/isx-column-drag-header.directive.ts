@@ -1,5 +1,4 @@
 import {Directive, Input, OnDestroy, OnInit} from '@angular/core';
-import {HammerGestureConfig} from '@angular/platform-browser';
 import {IsxColumnDragCellDirective} from './isx-column-drag-cell.directive';
 
 @Directive({
@@ -7,6 +6,8 @@ import {IsxColumnDragCellDirective} from './isx-column-drag-cell.directive';
   exportAs: 'isxColumnDragHeader',
 })
 export class IsxColumnDragHeaderDirective extends IsxColumnDragCellDirective implements OnInit, OnDestroy {
+
+  private hammerEl: HammerManager;
 
   @Input('isx-column-drag-header')
   set columnName(name: string) {
@@ -22,11 +23,19 @@ export class IsxColumnDragHeaderDirective extends IsxColumnDragCellDirective imp
     this.renderer.appendChild(dragContainer, this.el.nativeElement.firstChild);
 
     this.ngZone.runOutsideAngular(() => {
-      let hammerEl = new HammerGestureConfig().buildHammer(dragContainer);
-      hammerEl.on("panstart", (event) => this.isxColumnDragDirective.startDragStream.next({event, name: this.name}));
-      hammerEl.on("panleft", (event) => this.isxColumnDragDirective.leftDragStream.next({event, name: this.name}));
-      hammerEl.on("panright", (event) => this.isxColumnDragDirective.rightDragStream.next({event, name: this.name}));
-      hammerEl.on("panend", (event) => this.isxColumnDragDirective.dropStream.next({event, name: this.name}));
+      this.hammerEl = new Hammer(dragContainer);
+      this.hammerEl.on("panstart", (event) => this.isxColumnDragDirective.startDragStream.next({event, name: this.name}));
+      this.hammerEl.on("panleft", (event) => this.isxColumnDragDirective.leftDragStream.next({event, name: this.name}));
+      this.hammerEl.on("panright", (event) => this.isxColumnDragDirective.rightDragStream.next({event, name: this.name}));
+      this.hammerEl.on("panend", (event) => this.isxColumnDragDirective.dropStream.next({event, name: this.name}));
     });
+  }
+
+  ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.hammerEl.off("panstart");
+    this.hammerEl.off("panleft");
+    this.hammerEl.off("panright");
+    this.hammerEl.off("panend");
   }
 }

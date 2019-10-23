@@ -50,7 +50,7 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
     this.origDataSource = source;
   }
 
-  @Input() rowHeight = 55;
+  @Input() rowHeight = 30;
 
   @Output() fetchNextPage = new EventEmitter();
 
@@ -127,7 +127,11 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
 
   private updateRow(className: string) {
     Array.from<Element>(this.el.nativeElement.getElementsByClassName(className))
-      .forEach(el => el.scrollLeft = this.viewPort.elementRef.nativeElement.scrollLeft);
+      .forEach(el => {
+        // TODO: do it with transform on headers and content too; put headers into a div
+        // el.style.transform = `translateX(-${this.viewPort.elementRef.nativeElement.scrollLeft}px)`
+        el.scrollLeft = this.viewPort.elementRef.nativeElement.scrollLeft
+      });
   }
 
   updateHeaderAndFooterScroll() {

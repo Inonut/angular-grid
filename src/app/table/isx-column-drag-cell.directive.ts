@@ -1,20 +1,7 @@
-import {
-  AfterViewChecked,
-  ChangeDetectorRef,
-  Directive,
-  ElementRef,
-  HostBinding,
-  Input,
-  NgZone,
-  OnDestroy,
-  OnInit,
-  Optional,
-  Renderer2
-} from '@angular/core';
-import {fromEvent, merge, Subject} from 'rxjs';
+import {Directive, ElementRef, Input, NgZone, OnDestroy, OnInit, Optional, Renderer2} from '@angular/core';
+import {merge, Subject} from 'rxjs';
 import {IsxColumnDragDirective} from './isx-column-drag.directive';
 import {MatColumnDef} from '@angular/material';
-import {HammerGestureConfig} from '@angular/platform-browser';
 import {filter, takeUntil} from 'rxjs/operators';
 
 @Directive({

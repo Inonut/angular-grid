@@ -1,17 +1,13 @@
-import {Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Optional, Output, Renderer2} from '@angular/core';
-import {Subject} from 'rxjs';
-import {IsxColumnDragCellDirective} from './isx-column-drag-cell.directive';
-import {takeUntil} from 'rxjs/operators';
-import {IsxColumnResizeDirective} from './isx-column-resize.directive';
-import {MatColumnDef} from '@angular/material';
+import {Directive, Input, OnDestroy, OnInit} from '@angular/core';
 import {IsxColumnResizeCellDirective} from './isx-column-resize-cell.directive';
-import {HammerGestureConfig} from '@angular/platform-browser';
 
 @Directive({
   selector: `[isx-column-resize-header]`,
   exportAs: 'isxColumnResizeHeader',
 })
 export class IsxColumnResizeHeaderDirective extends IsxColumnResizeCellDirective implements OnInit, OnDestroy {
+
+  private hammerEl: HammerManager;
 
   @Input('isx-column-resize-header')
   set columnName(name: string) {
@@ -26,12 +22,20 @@ export class IsxColumnResizeHeaderDirective extends IsxColumnResizeCellDirective
     this.renderer.appendChild(this.el.nativeElement, resizeEl);
 
     this.ngZone.runOutsideAngular(() => {
-      let hammerEl = new HammerGestureConfig().buildHammer(resizeEl);
+      this.hammerEl = new Hammer(resizeEl);
       let initsize = 0;
-      hammerEl.on("panstart", (event) => initsize = this.el.nativeElement.clientWidth);
-      hammerEl.on("panleft", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.name}));
-      hammerEl.on("panright", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.name}));
-      hammerEl.on("panend", (event) => this.isxColumnResizeDirective.endResizeStream.next({size: initsize + event.deltaX, name: this.name}));
+      this.hammerEl.on("panstart", (event) => initsize = this.el.nativeElement.clientWidth);
+      this.hammerEl.on("panleft", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.name}));
+      this.hammerEl.on("panright", (event) => this.isxColumnResizeDirective.resizeStream.next({size: initsize + event.deltaX, name: this.name}));
+      this.hammerEl.on("panend", (event) => this.isxColumnResizeDirective.endResizeStream.next({size: initsize + event.deltaX, name: this.name}));
     });
+  }
+
+  ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.hammerEl.off("panstart");
+    this.hammerEl.off("panleft");
+    this.hammerEl.off("panright");
+    this.hammerEl.off("panend");
   }
 }
