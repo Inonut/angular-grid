@@ -86,7 +86,7 @@ export class IsxTableDataSource<T> extends MatTableDataSource<T>{
       return false;
     }
 
-    return this.filteredData.length == this.filteredData.length && !this.isLineSelected;
+    return this.selectionModel.selected.length == this.filteredData.length && !this.isLineSelected;
   }
 
   get isSelectedPartial() {

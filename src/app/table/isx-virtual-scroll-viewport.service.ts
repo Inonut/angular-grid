@@ -8,12 +8,14 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
   static BUFFER_SIZE = 20;
 
-  private scrollHeight!: number;
-  private readonly indexChange = new Subject<number>();
+  private rowHeight = 30;
+  private indexChange = new Subject<number>();
 
   private viewport: CdkVirtualScrollViewport;
 
-  public scrolledIndexChange: Observable<number>;
+  scrolledIndexChange: Observable<number>;
+  start: number;
+  end: number;
 
   constructor() {
     this.scrolledIndexChange = this.indexChange.asObservable().pipe(distinctUntilChanged());
@@ -22,7 +24,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   public attach(viewport: CdkVirtualScrollViewport): void {
     this.viewport = viewport;
     this.onDataLengthChanged();
-    this.updateContent(viewport);
+    this.updateContent();
   }
 
   public detach(): void {
@@ -31,12 +33,12 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   }
 
   public onContentScrolled(): void {
-    this.updateContent(this.viewport);
+    this.updateContent();
   }
 
   public onDataLengthChanged(): void {
     if (this.viewport) {
-      this.viewport.setTotalContentSize(this.viewport.getDataLength() * this.scrollHeight);
+      this.viewport.setTotalContentSize(this.viewport.getDataLength() * this.rowHeight);
     }
   }
 
@@ -50,28 +52,28 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
   public scrollToIndex(index: number, behavior: ScrollBehavior): void {
     if (this.viewport) {
-      this.viewport.scrollToOffset(index * this.scrollHeight, behavior);
+      this.viewport.scrollToOffset(index * this.rowHeight, behavior);
     }
   }
 
   public setScrollHeight(rowHeight: number) {
-    this.scrollHeight = rowHeight;
-    this.updateContent(this.viewport);
+    this.rowHeight = rowHeight;
+    this.updateContent();
   }
 
-  public getOffsetToRenderedContentStart() {
-    if(this.viewport == null) {
-      return 0;
-    }
-
-    return this.viewport.getOffsetToRenderedContentStart();
-  }
-
-  private updateContent(viewport: CdkVirtualScrollViewport) {
+  updateContent() {
     if (this.viewport) {
-      const newIndex = Math.max(0, Math.round(viewport.measureScrollOffset() / this.scrollHeight) - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
-      viewport.setRenderedContentOffset(this.scrollHeight * newIndex);
-      this.indexChange.next(Math.round(viewport.measureScrollOffset() / this.scrollHeight) + 1);
+      this.viewport.checkViewportSize();
+
+      const newIndex = Math.max(0, Math.round(this.viewport.measureScrollOffset() / this.rowHeight) - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
+      this.viewport.setRenderedContentOffset(this.rowHeight * newIndex);
+      const scrolledIndex = Math.round(this.viewport.measureScrollOffset() / this.rowHeight) + 1;
+
+      let range = Math.ceil(this.viewport.getViewportSize() / this.rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE / 2;
+      this.start = Math.max(0, scrolledIndex - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
+      this.end = Math.min(this.viewport.getDataLength(), scrolledIndex + range);
+
+      this.indexChange.next(scrolledIndex);
     }
   }
 }

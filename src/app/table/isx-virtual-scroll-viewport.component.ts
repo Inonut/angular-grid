@@ -36,6 +36,7 @@ import {TableVirtualScrollStrategy} from './isx-virtual-scroll-viewport.service'
 export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterViewInit, OnInit, AfterContentInit, AfterContentChecked {
   private unsubscribe = new Subject();
   resetDataSourceStream = new ReplaySubject<MatTableDataSource<T>>(1);
+  scrollIntoViewStream = new Subject<T>();
 
   private scrollTop = 0;
   private headerElList: Element[];
@@ -43,18 +44,13 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
 
   viewPort: CdkVirtualScrollViewport;
 
-  private range = 0;
-
   scrolledDataSource = new MatTableDataSource<T>();
-  origData: T[];
 
   @Input()
   set dataSource(source: MatTableDataSource<T>) {
     this.host.dataSource = this.scrolledDataSource;
     this.resetDataSourceStream.next(source);
   }
-
-  @Input() rowHeight = 30;
 
   @Output() fetchNextPage = new EventEmitter();
 
@@ -92,32 +88,35 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
         .pipe(
           startWith(null),
           takeUntil(this.unsubscribe),
-          tap(() => {
-            let gridHeight = this.viewPort.elementRef.nativeElement.clientHeight;
-
-            this.range = Math.ceil(gridHeight / this.rowHeight) + TableVirtualScrollStrategy.BUFFER_SIZE / 2;
-            this.scrollStrategy.setScrollHeight(this.rowHeight);
-          })
+          tap(() => this.scrollStrategy.updateContent())
         );
 
       let dataSource = this.resetDataSourceStream
         .pipe(
           takeUntil(this.unsubscribe),
           switchMap(source => source.connect()),
-          takeUntil(this.unsubscribe),
-          tap((data) => this.origData = data)
+          takeUntil(this.unsubscribe)
         );
 
       combineLatest([dataSource, this.scrollStrategy.scrolledIndexChange, resizeStream])
         .pipe(takeUntil(this.unsubscribe))
         .subscribe(([data, scrolledindex]) => {
+          this.scrolledDataSource.data = data.slice(this.scrollStrategy.start, this.scrollStrategy.end);
+        });
 
-          // Determine the start and end rendered range
-          const start = Math.max(0, scrolledindex - TableVirtualScrollStrategy.BUFFER_SIZE / 2);
-          const end = Math.min(data.length, scrolledindex + this.range);
+      combineLatest([dataSource, this.scrollIntoViewStream])
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(([data, item]) => {
+          setTimeout(() => {
+            if(!this.scrolledDataSource.data.includes(item)) {
+              this.viewPort.scrollToIndex(data.indexOf(item), 'auto');
+            }
 
-          this.scrolledDataSource.data = data.slice(start, end);
-          this.changeDetectorRef.detectChanges();
+            setTimeout(() => {
+              this.host._getRenderedRows(this.host._rowOutlet)[this.scrolledDataSource.data.indexOf(item)]
+                .scrollIntoView({behavior: 'auto', block: 'nearest', inline: 'nearest'});
+            });
+          });
         });
 
       fromEvent(this.viewPort.elementRef.nativeElement, 'scroll')
@@ -161,17 +160,7 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
   }
 
   scrollIntoView(item: T) {
-    setTimeout(() => {
-      if(!this.scrolledDataSource.data.includes(item)) {
-        this.viewPort.scrollToIndex(this.origData.indexOf(item), 'auto');
-      }
-
-      setTimeout(() => {
-        this.host._getRenderedRows(this.host._rowOutlet)[this.scrolledDataSource.data.indexOf(item)]
-          .scrollIntoView({behavior: 'auto', block: 'nearest', inline: 'nearest'})
-      });
-    });
-
+    this.scrollIntoViewStream.next(item);
   }
 
   ngOnDestroy(): void {
