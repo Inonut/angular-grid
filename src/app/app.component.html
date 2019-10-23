@@ -7,8 +7,8 @@
 
 <mat-table [dataSource]="dataSource"
            tabindex="-1" (keydown)="$event.preventDefault()"
-           (keyup.arrowUp)="selectionModel.selectPrevElement();"
-           (keyup.arrowDown)="selectNextElement();"
+           (keyup.arrowUp)="selectionModel.selectPrevElement(); viewScroll.scrollIntoView(selectionModel.lastSelected)"
+           (keyup.arrowDown)="selectionModel.selectNextElement(); viewScroll.scrollIntoView(selectionModel.lastSelected)"
            [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event; console($event); changeDetectorRef.detectChanges()"
            matSort
            isxVirtualScrollViewport #viewScroll=isxVirtualScrollViewport (fetchNextPage)="fetchNextPage($event)"

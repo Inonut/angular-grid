@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  NgZone,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AppService} from './app.service';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
@@ -26,7 +17,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   dataSource = new MatTableDataSource<PeriodicElement>();
 
-  selectionModel = new TableSelectionModel<PeriodicElement>(true).withData(this.dataSource);
+  selectionModel = new TableSelectionModel<PeriodicElement>(true).withData(this.dataSource.data);
   toggleFilter = false;
 
   displayedColumns: string[] = ['name', 'weight', 'symbol', 'position'];
@@ -47,16 +38,9 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((data) => this.dataSource.data = data);
 
-    /*this.selectionModel.changed
-      .pipe(
-        takeUntil(this.unsubscribe),
-        debounceTime(1)
-      )
-      .subscribe((data) => {
-        this.viewScroll.viewPort.scrollToIndex(this.dataSource.data.indexOf(data.added[0]) - 1);
-        console.log(this.viewScroll.viewPort.elementRef.nativeElement, this.ngZone.isStable);
-        this.viewScroll.viewPort.elementRef.nativeElement.scrollTop = 1000;
-      });*/
+    this.dataSource.connect()
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((data) => this.selectionModel.withData(data));
 
     new Array(16).fill(0).forEach(() => this.addColumn());
   }
@@ -67,9 +51,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngAfterContentChecked() {
-    /*if(this.selectionModel.selected && this.selectionModel.selected.length) {
-      this.viewScroll.viewPort.scrollToIndex(this.dataSource.data.indexOf(this.selectionModel.selected[0]) - 1);
-    }*/
   }
 
   addColumn() {
@@ -120,13 +101,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get filteredColumnsToDisplay() {
     return this.columnsToDisplay.map(el => 'filter_' + el);
-  }
-
-  selectNextElement() {
-    this.selectionModel.selectNextElement();
-    setTimeout(() => {
-      // this.viewScroll.viewPort.scrollToIndex(this.dataSource.data.indexOf(data.added[0]) - 1);
-    });
   }
 }
 

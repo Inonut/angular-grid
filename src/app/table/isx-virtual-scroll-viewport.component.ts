@@ -47,6 +47,7 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
   private range = 0;
 
   scrolledDataSource = new MatTableDataSource<T>();
+  origData: T[];
 
   @Input()
   set dataSource(source: MatTableDataSource<T>) {
@@ -105,6 +106,7 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
           takeUntil(this.unsubscribe),
           switchMap(source => source.connect()),
           takeUntil(this.unsubscribe),
+          tap((data) => this.origData = data)
         );
 
       combineLatest([dataSource, this.scrollStrategy.scrolledIndexChange, resizeStream])
@@ -157,6 +159,20 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
       this.updateRow(this.headerElList);
       this.updateRow(this.footerElList);
     })
+  }
+
+  scrollIntoView(item: T) {
+    setTimeout(() => {
+      if(!this.scrolledDataSource.data.includes(item)) {
+        this.viewPort.scrollToIndex(this.origData.indexOf(item), 'auto');
+      }
+
+      setTimeout(() => {
+        this.host._getRenderedRows(this.host._rowOutlet)[this.scrolledDataSource.data.indexOf(item)]
+          .scrollIntoView({behavior: 'auto', block: 'nearest', inline: 'nearest'})
+      });
+    });
+
   }
 
   ngOnDestroy(): void {
