@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AppService} from './app.service';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
@@ -8,7 +8,8 @@ import {SelectionModel} from '@angular/cdk/collections';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit, OnDestroy {
   private unsubscribe = new Subject();
@@ -31,6 +32,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.appService.fetchData()
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((data) => this.dataSource.data = data);
+
+    new Array(16).fill(0).forEach(() => this.addColumn());
   }
 
   ngOnDestroy(): void {

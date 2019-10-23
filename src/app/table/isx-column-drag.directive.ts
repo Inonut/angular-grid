@@ -70,7 +70,7 @@ export class IsxColumnDragDirective implements OnInit, OnDestroy {
           this.columnsCache[name].forEach(directive => directive.moveTo(-this.added));
           this.added = 0;
 
-          setTimeout(() => this.ngZone.run(() => this.drop.emit(this.newOrder)));
+          setTimeout(() => this.drop.emit(this.newOrder));
         });
     });
   }

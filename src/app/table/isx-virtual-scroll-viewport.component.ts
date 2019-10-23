@@ -5,22 +5,24 @@ import {
   ChangeDetectorRef,
   ComponentFactoryResolver,
   Directive,
-  ElementRef, EventEmitter,
+  ElementRef,
+  EventEmitter,
   Host,
   Inject,
   Input,
   IterableDiffers,
   NgZone,
   OnDestroy,
-  OnInit, Output,
+  OnInit,
+  Output,
   Renderer2,
   ViewContainerRef
 } from '@angular/core';
-import {combineLatest, fromEvent, merge, Subject} from 'rxjs';
+import {combineLatest, fromEvent, merge, ReplaySubject, Subject} from 'rxjs';
 import {MatTable, MatTableDataSource} from '@angular/material';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY} from '@angular/cdk/scrolling';
-import {startWith, takeUntil, tap} from 'rxjs/operators';
+import {startWith, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {TableVirtualScrollStrategy} from './isx-virtual-scroll-viewport.service';
 
 @Directive({
@@ -33,21 +35,23 @@ import {TableVirtualScrollStrategy} from './isx-virtual-scroll-viewport.service'
 })
 export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterViewInit, OnInit, AfterContentInit, AfterContentChecked {
   private unsubscribe = new Subject();
-  private updateStream = new Subject();
+  private updateGridStream = new Subject();
+  resetDataSourceStream = new ReplaySubject<MatTableDataSource<T>>(1);
 
   private scrollTop = 0;
+  private headerElList: Element[];
+  private footerElList: Element[];
 
   viewPort: CdkVirtualScrollViewport;
 
   private range = 0;
 
   scrolledDataSource = new MatTableDataSource<T>();
-  origDataSource = new MatTableDataSource<T>();
 
   @Input()
   set dataSource(source: MatTableDataSource<T>) {
     this.host.dataSource = this.scrolledDataSource;
-    this.origDataSource = source;
+    this.resetDataSourceStream.next(source);
   }
 
   @Input() rowHeight = 30;
@@ -75,12 +79,16 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
     this.viewPort = cdkVirtualScrollViewportRef.instance;
   }
 
+/*  ngDoCheck() {
+    console.log(performance.now());
+  }*/
+
   ngAfterContentInit(): void {
   }
 
   ngAfterViewInit(): void {
     this.ngZone.runOutsideAngular(() => {
-      let resizeStream = merge(fromEvent(window, 'resize'), this.updateStream)
+      let resizeStream = merge(fromEvent(window, 'resize'), this.updateGridStream)
         .pipe(
           startWith(null),
           takeUntil(this.unsubscribe),
@@ -92,7 +100,14 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
           })
         );
 
-      combineLatest([this.origDataSource.connect(), this.scrollStrategy.scrolledIndexChange, resizeStream])
+      let dataSource = this.resetDataSourceStream
+        .pipe(
+          takeUntil(this.unsubscribe),
+          switchMap(source => source.connect()),
+          takeUntil(this.unsubscribe),
+        );
+
+      combineLatest([dataSource, this.scrollStrategy.scrolledIndexChange, resizeStream])
         .pipe(takeUntil(this.unsubscribe))
         .subscribe(([data, scrolledindex]) => {
 
@@ -112,11 +127,14 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
         });
 
       this.scrollTop = this.viewPort.elementRef.nativeElement.scrollTop;
+
+      this.viewPort.scrolledIndexChange
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(val => this.fetchNextPage.next(val));
     });
 
-    this.viewPort.scrolledIndexChange
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(val => this.fetchNextPage.next(val));
+    this.headerElList = this.el.nativeElement.getElementsByClassName('mat-header-row');
+    this.footerElList = this.el.nativeElement.getElementsByClassName('mat-header-row');
   }
 
 
@@ -125,8 +143,8 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
     this.viewPort.elementRef.nativeElement.scrollTop = this.scrollTop;
   }
 
-  private updateRow(className: string) {
-    Array.from<Element>(this.el.nativeElement.getElementsByClassName(className))
+  private updateRow(el: Element[]) {
+    Array.from<Element>(el)
       .forEach(el => {
         // TODO: do it with transform on headers and content too; put headers into a div
         // el.style.transform = `translateX(-${this.viewPort.elementRef.nativeElement.scrollLeft}px)`
@@ -136,11 +154,9 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
 
   updateHeaderAndFooterScroll() {
     setTimeout(() => {
-      this.ngZone.runOutsideAngular(() => {
-        this.updateRow('mat-header-row');
-        this.updateRow('mat-footer-row');
-      })
-    });
+      this.updateRow(this.headerElList);
+      this.updateRow(this.footerElList);
+    })
   }
 
   ngOnDestroy(): void {

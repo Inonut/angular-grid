@@ -14,13 +14,15 @@ import {
 } from '@angular/core';
 import {CdkVirtualForOf, CdkVirtualForOfContext} from '@angular/cdk/scrolling';
 import {CollectionViewer, DataSource, ListRange} from '@angular/cdk/collections';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {IsxVirtualScrollViewportComponent} from './isx-virtual-scroll-viewport.component';
+import {takeUntil} from 'rxjs/operators';
 
 @Directive({
   selector: '[isxVirtualFor]',
 })
 export class IsxVirtualForDirective<T> implements CollectionViewer, DoCheck, OnDestroy, AfterViewInit {
+  private unsubscribe = new Subject();
 
   private virtualForDirective: CdkVirtualForOf<T>;
 
@@ -36,7 +38,13 @@ export class IsxVirtualForDirective<T> implements CollectionViewer, DoCheck, OnD
 
   ngAfterViewInit(): void {
     this.virtualForDirective = new CdkVirtualForOf<T>(this._viewContainerRef, this._template, this._differs, this.viewScroll.viewPort, this.ngZone);
-    this.virtualForDirective.cdkVirtualForOf = this.viewScroll.origDataSource;
+
+    this.viewScroll.resetDataSourceStream
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((source) => {
+        this.virtualForDirective.cdkVirtualForOf = source;
+      });
+
   }
 
   ngDoCheck(): void {
@@ -45,5 +53,7 @@ export class IsxVirtualForDirective<T> implements CollectionViewer, DoCheck, OnD
 
   ngOnDestroy(): void {
     this.virtualForDirective && this.virtualForDirective.ngOnDestroy();
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
   }
 }
