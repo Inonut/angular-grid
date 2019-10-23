@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { VirtualScrollStrategy, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import {VirtualScrollStrategy, CdkVirtualScrollViewport, FixedSizeVirtualScrollStrategy} from '@angular/cdk/scrolling';
 import { Subject, Observable } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
@@ -26,7 +26,8 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   }
 
   public detach(): void {
-    // no-op
+    this.indexChange.complete();
+    this.viewport = null;
   }
 
   public onContentScrolled(): void {
@@ -48,7 +49,9 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   }
 
   public scrollToIndex(index: number, behavior: ScrollBehavior): void {
-    // no-op
+    if (this.viewport) {
+      this.viewport.scrollToOffset(index * this.scrollHeight, behavior);
+    }
   }
 
   public setScrollHeight(rowHeight: number) {

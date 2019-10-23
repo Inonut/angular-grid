@@ -79,7 +79,7 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
     this.viewPort = cdkVirtualScrollViewportRef.instance;
   }
 
-/*  ngDoCheck() {
+  /*ngDoCheck() {
     console.log(performance.now());
   }*/
 

@@ -2,14 +2,33 @@
   <button mat-raised-button (click)="addColumn()"> Add column </button>
   <button mat-raised-button (click)="removeColumn()"> Remove column </button>
   <button mat-raised-button (click)="shuffle()"> Shuffle </button>
-  <button mat-raised-button (click)="toggleFilter = !toggleFilter; vewScroll.updateHeaderAndFooterScroll()">Toggle filter</button>
+  <button mat-raised-button (click)="toggleFilter = !toggleFilter; viewScroll.updateHeaderAndFooterScroll()">Toggle filter</button>
 </div>
 
 <mat-table [dataSource]="dataSource"
+           tabindex="-1" (keydown)="$event.preventDefault()"
+           (keyup.arrowUp)="selectionModel.selectPrevElement();"
+           (keyup.arrowDown)="selectNextElement();"
            [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event; console($event); changeDetectorRef.detectChanges()"
            matSort
-           isxVirtualScrollViewport #vewScroll=isxVirtualScrollViewport (fetchNextPage)="fetchNextPage($event)"
+           isxVirtualScrollViewport #viewScroll=isxVirtualScrollViewport (fetchNextPage)="fetchNextPage($event)"
            isxColumnResize (resize)="console($event)">
+
+  <ng-container matColumnDef="OBJECT_SELECTION">
+    <mat-header-cell *matHeaderCellDef [style.width.px]="30">
+      <mat-checkbox [checked]="selectionModel.isSelectedAll" [indeterminate]="selectionModel.isSelectedPartial" [disabled]="!selectionModel.isData"
+                    (change)="selectionModel.toggleAllCheck($event.checked)"></mat-checkbox>
+    </mat-header-cell>
+    <mat-cell *matCellDef="let element" [style.width.px]="30">
+      <mat-checkbox [checked]="selectionModel.isSelectedCheck(element)"
+                    (change)="selectionModel.toggleCheck(element)"
+                    (click)="$event.stopPropagation()"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="filter_OBJECT_SELECTION">
+    <mat-header-cell *matHeaderCellDef [style.width.px]="30"></mat-header-cell>
+  </ng-container>
 
   <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
     <ng-container *ngIf="column != 'name'">
@@ -31,10 +50,11 @@
     </ng-container>
   </ng-container>
 
-  <mat-header-row *matHeaderRowDef="columnsToDisplay;"></mat-header-row>
-  <mat-header-row *matHeaderRowDef="filteredColumnsToDisplay;" [class.hidden]="!toggleFilter"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="['OBJECT_SELECTION'].concat(columnsToDisplay)"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="['filter_OBJECT_SELECTION'].concat(filteredColumnsToDisplay)" [class.hidden]="!toggleFilter"></mat-header-row>
 
-  <ng-template let-row matRowDef [matRowDefColumns]="columnsToDisplay" isxVirtualFor>
-    <mat-row (click)="select(row)" [class.selected]="selectionModel.isSelected(row)"></mat-row>
+  <ng-template let-row matRowDef [matRowDefColumns]="['OBJECT_SELECTION'].concat(columnsToDisplay)" isxVirtualFor>
+    <mat-row (click)="selectionModel.selectLine(row); changeDetectorRef.detectChanges()" [class.selected]="selectionModel.isSelected(row)"></mat-row>
   </ng-template>
 </mat-table>
+
