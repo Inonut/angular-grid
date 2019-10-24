@@ -12,6 +12,7 @@
       .mat-header-row,
       .mat-footer-row {
         position: sticky;
+        transform: translateX(var(--translate-x));
 
         &:after {
           content: "";

@@ -18,12 +18,13 @@ import {
   Renderer2,
   ViewContainerRef
 } from '@angular/core';
-import {combineLatest, fromEvent, merge, ReplaySubject, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, fromEvent, of, Subject, timer} from 'rxjs';
 import {MatTable, MatTableDataSource} from '@angular/material';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY} from '@angular/cdk/scrolling';
-import {startWith, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {filter, mapTo, startWith, switchMap, take, takeUntil, tap} from 'rxjs/operators';
 import {TableVirtualScrollStrategy} from './isx-virtual-scroll-viewport.service';
+import {IsxTableDataSource} from './isx-table-data-source.model';
 
 @Directive({
   selector: '[isxVirtualScrollViewport]',
@@ -35,18 +36,14 @@ import {TableVirtualScrollStrategy} from './isx-virtual-scroll-viewport.service'
 })
 export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterViewInit, OnInit, AfterContentInit, AfterContentChecked {
   private unsubscribe = new Subject();
-  resetDataSourceStream = new ReplaySubject<MatTableDataSource<T>>(1);
+  resetDataSourceStream = new BehaviorSubject<IsxTableDataSource<T>>(null);
   scrollIntoViewStream = new Subject<T>();
-
-  private scrollTop = 0;
-  private headerElList: Element[];
-  private footerElList: Element[];
 
   viewPort: CdkVirtualScrollViewport;
   scrolledDataSource = new MatTableDataSource<T>();
 
   @Input()
-  set dataSource(source: MatTableDataSource<T>) {
+  set dataSource(source: IsxTableDataSource<T>) {
     this.host.dataSource = this.scrolledDataSource;
     this.resetDataSourceStream.next(source);
   }
@@ -103,36 +100,41 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
 
       let dataSource = this.resetDataSourceStream
         .pipe(
+          filter(source => source != null),
           takeUntil(this.unsubscribe),
           switchMap(source => source.connect()),
           takeUntil(this.unsubscribe)
         );
 
-      combineLatest([dataSource, this.scrollStrategy.scrolledIndexChange, resizeStream])
+      let scrolledDataSourceChanged = combineLatest([dataSource, this.scrollStrategy.scrolledIndexChange, resizeStream]);
+
+      scrolledDataSourceChanged
         .pipe(takeUntil(this.unsubscribe))
         .subscribe(([data, scrolledindex]) => {
           this.scrolledDataSource.data = data.slice(this.scrollStrategy.start, this.scrollStrategy.end);
         });
 
-      combineLatest([dataSource, this.scrollIntoViewStream])
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe(([data, item]) => {
-          setTimeout(() => {
+      this.scrollIntoViewStream
+        .pipe(
+          takeUntil(this.unsubscribe),
+          switchMap((item) => {
             if(!this.scrolledDataSource.data.includes(item)) {
-              this.viewPort.scrollToIndex(data.indexOf(item), 'auto');
+              this.viewPort.scrollToIndex(this.resetDataSourceStream.getValue().sortedData.indexOf(item) - 1, 'auto');
+              return scrolledDataSourceChanged.pipe(take(1), switchMap(() => timer(100)), take(1), mapTo(item))
+            } else {
+              return of(item);
             }
-
-            setTimeout(() => {
-              this.host._getRenderedRows(this.host._rowOutlet)[this.scrolledDataSource.data.indexOf(item)]
-                .scrollIntoView({behavior: 'auto', block: 'nearest', inline: 'nearest'});
-            });
-          });
+          }),
+          takeUntil(this.unsubscribe)
+        )
+        .subscribe((item) => {
+          this.host._getRenderedRows(this.host._rowOutlet)[this.scrolledDataSource.data.indexOf(item)]
+            .scrollIntoView({behavior: 'auto', block: 'nearest', inline: 'nearest'});
         });
 
       fromEvent(this.viewPort.elementRef.nativeElement, 'scroll')
         .pipe(takeUntil(this.unsubscribe))
         .subscribe((event) => {
-          this.scrollTop = this.viewPort.elementRef.nativeElement.scrollTop;
           this.updateHeaderAndFooterScroll()
         });
 
@@ -140,30 +142,13 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
         .pipe(takeUntil(this.unsubscribe))
         .subscribe(val => this.fetchNextPage.next(val));
     });
-
-    this.scrollTop = this.viewPort.elementRef.nativeElement.scrollTop;
-    this.headerElList = this.el.nativeElement.getElementsByClassName('mat-header-row');
-    this.footerElList = this.el.nativeElement.getElementsByClassName('mat-footer-row');
   }
-
 
   ngAfterContentChecked(): void {
-    this.updateHeaderAndFooterScroll();
-    this.viewPort.elementRef.nativeElement.scrollTop = this.scrollTop;
-  }
-
-  private updateRow(el: Element[]) {
-    if(!el) {
-      return;
-    }
-
-    Array.from<Element>(el)
-      .forEach(el => this.renderer.setStyle(el, 'transform', `translateX(-${this.viewPort.elementRef.nativeElement.scrollLeft}px)`));
   }
 
   updateHeaderAndFooterScroll() {
-    this.updateRow(this.headerElList);
-    this.updateRow(this.footerElList);
+    this.el.nativeElement.style.setProperty('--translate-x', `-${this.viewPort.elementRef.nativeElement.scrollLeft}px`);
   }
 
   scrollIntoView(item: T) {
