@@ -148,7 +148,7 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
   }
 
   updateHeaderAndFooterScroll() {
-    this.el.nativeElement.style.setProperty('--translate-x', `-${this.viewPort.elementRef.nativeElement.scrollLeft}px`);
+    this.el.nativeElement.style.setProperty('--table-translate-x', `-${this.viewPort.elementRef.nativeElement.scrollLeft}px`);
   }
 
   scrollIntoView(item: T) {
