@@ -43,7 +43,6 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
   private footerElList: Element[];
 
   viewPort: CdkVirtualScrollViewport;
-
   scrolledDataSource = new MatTableDataSource<T>();
 
   @Input()
@@ -71,6 +70,17 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
     let cdkVirtualScrollViewportRef = portal.attachComponentPortal(cdkVirtualScrollViewport);
     this.renderer.appendChild(this.el.nativeElement, cdkVirtualScrollViewportRef.location.nativeElement);
     this.renderer.appendChild(cdkVirtualScrollViewportRef.instance._contentWrapper.nativeElement, this.host._rowOutlet.elementRef.nativeElement);
+
+    let headerContainer = this.renderer.createElement('div');
+    this.renderer.addClass(headerContainer, 'isx-table-header-container');
+    this.renderer.insertBefore(this.el.nativeElement, headerContainer, cdkVirtualScrollViewportRef.location.nativeElement);
+    this.renderer.appendChild(headerContainer, this.host._headerRowOutlet.elementRef.nativeElement);
+
+    let footerContainer = this.renderer.createElement('div');
+    this.renderer.addClass(footerContainer, 'isx-table-footer-container');
+    this.renderer.appendChild(this.el.nativeElement, footerContainer);
+    this.renderer.appendChild(footerContainer, this.host._footerRowOutlet.elementRef.nativeElement);
+
 
     this.viewPort = cdkVirtualScrollViewportRef.instance;
   }
@@ -126,15 +136,14 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
           this.updateHeaderAndFooterScroll()
         });
 
-      this.scrollTop = this.viewPort.elementRef.nativeElement.scrollTop;
-
       this.viewPort.scrolledIndexChange
         .pipe(takeUntil(this.unsubscribe))
         .subscribe(val => this.fetchNextPage.next(val));
     });
 
+    this.scrollTop = this.viewPort.elementRef.nativeElement.scrollTop;
     this.headerElList = this.el.nativeElement.getElementsByClassName('mat-header-row');
-    this.footerElList = this.el.nativeElement.getElementsByClassName('mat-header-row');
+    this.footerElList = this.el.nativeElement.getElementsByClassName('mat-footer-row');
   }
 
 
@@ -144,19 +153,17 @@ export class IsxVirtualScrollViewportComponent<T> implements OnDestroy, AfterVie
   }
 
   private updateRow(el: Element[]) {
+    if(!el) {
+      return;
+    }
+
     Array.from<Element>(el)
-      .forEach(el => {
-        // TODO: do it with transform on headers and content too; put headers into a div
-        // el.style.transform = `translateX(-${this.viewPort.elementRef.nativeElement.scrollLeft}px)`
-        el.scrollLeft = this.viewPort.elementRef.nativeElement.scrollLeft
-      });
+      .forEach(el => this.renderer.setStyle(el, 'transform', `translateX(-${this.viewPort.elementRef.nativeElement.scrollLeft}px)`));
   }
 
   updateHeaderAndFooterScroll() {
-    setTimeout(() => {
-      this.updateRow(this.headerElList);
-      this.updateRow(this.footerElList);
-    })
+    this.updateRow(this.headerElList);
+    this.updateRow(this.footerElList);
   }
 
   scrollIntoView(item: T) {

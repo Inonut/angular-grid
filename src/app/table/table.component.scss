@@ -4,21 +4,29 @@
       flex: 1;
     }
 
-    .mat-header-row {
+    .isx-table-header-container,
+    .isx-table-footer-container {
+      position: relative;
       overflow: hidden;
 
-      &:after {
-        content: "";
-        width: 16px;
-        height: 100%;
+      .mat-header-row,
+      .mat-footer-row {
         position: sticky;
-        right: 0;
-        background: transparent;
-        flex-shrink: 0;
-      }
 
-      .mat-header-cell {
-        flex-shrink: 0;
+        &:after {
+          content: "";
+          width: 16px;
+          height: 100%;
+          position: sticky;
+          right: 0;
+          background: transparent;
+          flex-shrink: 0;
+        }
+
+        .mat-header-cell,
+        .mat-footer-cell {
+          flex-shrink: 0;
+        }
       }
     }
   }
