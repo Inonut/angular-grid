@@ -44,7 +44,7 @@
 
   <ng-container [matColumnDef]="column" *ngFor="let column of filteredColumnsToDisplay">
     <ng-container *ngIf="column != 'filter_name'">
-      <mat-header-cell *matHeaderCellDef [isx-column-drag-cell]="parentHeader(column)" [isx-column-resize-cell]="parentHeader(column)" [style.width.px]="100"> {{format(column)}} </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef [isx-column-drag-cell]="parentHeader(column)" [isx-column-resize-cell]="parentHeader(column)" [style.width.px]="100" [style.minWidth.px]="50"> {{format(column)}} </mat-header-cell>
     </ng-container>
     <ng-container *ngIf="column == 'filter_name'">
       <mat-header-cell *matHeaderCellDef [style.width.px]="200"></mat-header-cell>

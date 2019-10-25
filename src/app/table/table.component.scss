@@ -185,6 +185,16 @@
 
 @mixin resize() {
   .mat-table {
+    .mat-header-row,
+    .mat-row {
+      .mat-header-cell,
+      .mat-cell {
+        &.isx-resize-column {
+          pointer-events: none;
+        }
+      }
+    }
+
     .mat-header-row {
       .mat-header-cell {
         position: relative;
