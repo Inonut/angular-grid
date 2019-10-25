@@ -71,7 +71,7 @@
 
     .mat-row {
       .mat-cell {
-        background: white;
+        background: rgba(0,0,0, 0.1);
       }
     }
   }
@@ -148,7 +148,47 @@
   }
 }
 
+@mixin row-buttons() {
+  .mat-table {
+    .mat-row {
+      position: relative;
+      &:hover {
+        .isx-table-actions-show-container {
+          display: flex;
+          right: initial;
+          position: absolute;
+          transform: translateX(var(--row-actions-translate-x));
+          background: linear-gradient(90deg, rgba(white, 0) 0, white 15%, white 85%, rgba(white, 0));
+        }
+      }
+
+      .isx-table-actions-show-container {
+        display: none;
+        position: absolute;
+        flex: 1;
+        justify-content: flex-end;
+        height: 21px;
+        align-self: center;
+        z-index: 1;
+        .isx-table-actions-show {
+          display: flex;
+          align-items: center;
+          height: 21px;
+          right: 0;
+          padding: 0 48px;
+          white-space: nowrap;
+          .mat-button {
+            width: 26px;
+            height: 24px;
+          }
+        }
+      }
+    }
+  }
+}
+
 @include table();
 @include virtual-scroll();
 @include drag-and-drop();
 @include resize();
+@include row-buttons();

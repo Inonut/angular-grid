@@ -17,6 +17,7 @@ import {IsxColumnResizeHeaderDirective} from './table/isx-column-resize-header.d
 import {IsxVirtualForDirective} from './table/isx-virtual-for.directive';
 import {IsxVirtualScrollViewportComponent} from './table/isx-virtual-scroll-viewport.component';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+import {IsxRowActionDirective} from './table/isx-row-action.directive';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,8 @@ import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
     IsxColumnResizeCellDirective,
 
     IsxVirtualForDirective,
+
+    IsxRowActionDirective,
 
     IsxVirtualScrollViewportComponent
   ],

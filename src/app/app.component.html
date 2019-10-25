@@ -54,7 +54,23 @@
   <mat-header-row *matHeaderRowDef="['filter_OBJECT_SELECTION'].concat(filteredColumnsToDisplay)" [class.hidden]="!toggleFilter"></mat-header-row>
 
   <ng-template let-row matRowDef [matRowDefColumns]="['OBJECT_SELECTION'].concat(columnsToDisplay)" isxVirtualFor>
-    <mat-row (click)="dataSource.selectLine(row); changeDetectorRef.detectChanges()" [class.selected]="selectionModel.isSelected(row)"></mat-row>
+    <mat-row (click)="dataSource.selectLine(row); changeDetectorRef.detectChanges()" [class.selected]="selectionModel.isSelected(row)" isx-row-action>
+      <ng-template cdkPortal>
+        <div class="isx-table-actions-show-container">
+          <div class="isx-table-actions-show">
+            <button mat-icon-button class="isx-table-action-btn" matTooltip="Send to FE">
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+            <button mat-icon-button class="isx-table-action-btn" matTooltip="Do-Check" >
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+            <button mat-icon-button class="isx-table-action-btn" matTooltip="Oil Request" >
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+      </ng-template>
+    </mat-row>
   </ng-template>
 </mat-table>
 
