@@ -15,11 +15,11 @@
            isxColumnResize (resize)="console($event)">
 
   <ng-container matColumnDef="OBJECT_SELECTION">
-    <mat-header-cell *matHeaderCellDef [style.width.px]="30">
+    <mat-header-cell *matHeaderCellDef [style.width.px]="36">
       <mat-checkbox [checked]="dataSource.isSelectedAll" [indeterminate]="dataSource.isSelectedPartial" [disabled]="!dataSource.isData"
                     (change)="dataSource.toggleAllCheck($event.checked)"></mat-checkbox>
     </mat-header-cell>
-    <mat-cell *matCellDef="let element" [style.width.px]="30">
+    <mat-cell *matCellDef="let element" [style.width.px]="36">
       <mat-checkbox class="isx-over-table-actions"
                     [checked]="dataSource.isSelectedCheck(element)"
                     (change)="dataSource.toggleCheck(element); changeDetectorRef.detectChanges()"
@@ -28,7 +28,7 @@
   </ng-container>
 
   <ng-container matColumnDef="filter_OBJECT_SELECTION">
-    <mat-header-cell *matHeaderCellDef [style.width.px]="30"></mat-header-cell>
+    <mat-header-cell *matHeaderCellDef [style.width.px]="36"></mat-header-cell>
   </ng-container>
 
   <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
