@@ -44,7 +44,7 @@ export class IsxRowActionDirective implements AfterContentInit, OnDestroy {
         .subscribe((event: MouseEvent) => {
           if (this.allowMouseFollow) {
             let offsetX = 0;
-            if(event.clientX + viewRef.rootNodes[0].clientWidth > screen.availWidth) {
+            if(event.clientX + viewRef.rootNodes[0].clientWidth > window.innerWidth) {
               offsetX = event.layerX - viewRef.rootNodes[0].clientWidth;
             } else {
               offsetX = event.layerX;

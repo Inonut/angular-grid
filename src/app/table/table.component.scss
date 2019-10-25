@@ -125,14 +125,14 @@
 
       border-width: 0 0 2px;
 
-      .mat-header-cell {
-        background-color: white;
-      }
+      background-color: white;
     }
 
     .mat-row {
       min-height: 20px;
       max-height: 25px;
+
+      background-color: mat-color($primary, 100);
 
       .mat-cell {
         min-height: inherit;
@@ -140,8 +140,6 @@
 
         overflow: hidden;
         word-wrap: break-word;
-
-        background-color: mat-color($primary, 100);
       }
     }
   }
@@ -187,16 +185,6 @@
 
 @mixin resize() {
   .mat-table {
-    .mat-header-row,
-    .mat-row {
-      .mat-header-cell,
-      .mat-cell {
-        &.isx-resize-column {
-          pointer-events: none;
-        }
-      }
-    }
-
     .mat-header-row {
       .mat-header-cell {
         position: relative;
@@ -211,7 +199,7 @@
 
           &:after {
             content: "";
-            background: black;
+            background: rgba(0,0,0,.12);;
             position: absolute;
             height: 100%;
             width: 1px;
@@ -279,7 +267,7 @@
         background-color: mat-color($accent, 100, 0.3);
       }
 
-      .isx-selection {
+      &.isx-selected {
         background-color: mat-color($accent, 100, 0.7);
       }
     }
@@ -334,5 +322,5 @@ $desktop-theme: mat-light-theme($desktop-primary, $desktop-accent, $desktop-warn
 @include virtual-scroll($desktop-theme);
 @include drag-and-drop($desktop-theme);
 @include selection($desktop-theme);
-//@include resize();
-//@include row-buttons();
+@include resize();
+@include row-buttons();
