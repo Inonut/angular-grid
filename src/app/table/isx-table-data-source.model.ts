@@ -7,8 +7,10 @@ export class IsxTableDataSource<T> extends MatTableDataSource<T>{
   private lastElement: T;
   private selectionModel: IsxSelectionModel<T>;
 
+  private _sortedData = [];
+  private _filteredData = [];
+
   firstLineUp = new Subject();
-  sortedData: T[];
 
   constructor() {
     super();
@@ -99,5 +101,29 @@ export class IsxTableDataSource<T> extends MatTableDataSource<T>{
 
   get lastSelected() {
     return this.lastElement;
+  }
+
+  get filteredData() {
+    if(this._filteredData.length) {
+      return this._filteredData
+    } else {
+      return this.data;
+    }
+  }
+
+  get sortedData() {
+    if(this._sortedData.length) {
+      return this._sortedData
+    } else {
+      return this.data;
+    }
+  }
+
+  set filteredData(val: T[]) {
+    this._filteredData = val;
+  }
+
+  set sortedData(val: T[]) {
+    this._sortedData = val;
   }
 }
