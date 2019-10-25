@@ -8,7 +8,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
   static BUFFER_SIZE = 20;
 
-  private rowHeight = 30;
+  private rowHeight = 20;
   private indexChange = new Subject<number>();
 
   private viewport: CdkVirtualScrollViewport;

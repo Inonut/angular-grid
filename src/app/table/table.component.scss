@@ -1,6 +1,40 @@
-@mixin virtual-scroll() {
+@import '~@angular/material/theming';
+
+.scrollable {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &.visible-scroll {
+    -webkit-overflow-scrolling: auto;
+  }
+
+  &.scroll-left-position {
+    direction: rtl;
+
+    & > * {
+      direction: ltr;
+    }
+  }
+
+  &::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+    display: block;
+    box-sizing: border-box;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #CCCCCC;
+  }
+}
+
+@mixin virtual-scroll($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+
   .mat-table {
     .cdk-virtual-scroll-viewport {
+      @extend .scrollable;
       flex: 1;
     }
 
@@ -8,15 +42,17 @@
     .isx-table-footer-container {
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
 
       .mat-header-row,
       .mat-footer-row {
+        align-self: flex-start;
         position: sticky;
         transform: translateX(var(--table-translate-x));
 
         &:after {
           content: "";
-          width: 16px;
           height: 100%;
           position: sticky;
           right: 0;
@@ -33,11 +69,20 @@
   }
 }
 
-@mixin table() {
+@mixin table($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+
   .mat-table {
+    @extend .scrollable;
+
     display: flex;
     flex-direction: column;
     flex: 1;
+    background-color: mat-color($primary, 100);
+
+    font: 400 12px/16px Verdana,Georgia,sans-serif;
+    font-family: Verdana,Georgia,sans-serif;
 
     * {
       box-sizing: border-box;
@@ -49,35 +94,63 @@
 
     .mat-header-row,
     .mat-row {
-      min-height: 30px;
-      max-height: 30px;
-      height: 30px;
       display: flex;
+      flex-shrink: 0;
+
+      border-width: 0 0 1px;
+      border-style: solid;
+      border-bottom-color: rgba(0,0,0,.12);
 
       .mat-header-cell,
       .mat-cell {
+        display: flex;
         flex: initial;
-        padding: 2px;
-        border: 1px solid black;
+        flex-shrink: 0;
         user-select: none;
+        height: 100%;
+        min-height: 100%;
+
+        border-right-width: 1px;
+        border-right-style: solid;
+        border-right-color: rgba(0,0,0,.12);
+
+        padding: 0 10px;
       }
     }
 
     .mat-header-row {
+      min-height: 30px;
+      max-height: 30px;
+      height: 30px;
+
+      border-width: 0 0 2px;
+
       .mat-header-cell {
-        background: aquamarine;
+        background-color: white;
       }
     }
 
     .mat-row {
+      min-height: 20px;
+      max-height: 25px;
+
       .mat-cell {
-        background: rgba(0,0,0, 0.1);
+        min-height: inherit;
+        align-items: center;
+
+        overflow: hidden;
+        word-wrap: break-word;
+
+        background-color: mat-color($primary, 100);
       }
     }
   }
 }
 
-@mixin drag-and-drop() {
+@mixin drag-and-drop($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+
   .mat-table {
     .mat-header-row,
     .mat-row {
@@ -99,9 +172,11 @@
       .mat-header-cell {
         display: flex;
         flex-direction: column;
+        justify-content: center;
 
         .drag-column-container {
           display: flex;
+          align-items: center;
           flex: 1;
           width: 100%;
         }
@@ -192,8 +267,72 @@
   }
 }
 
-@include table();
-@include virtual-scroll();
-@include drag-and-drop();
-@include resize();
-@include row-buttons();
+
+@mixin selection($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+
+  .mat-table {
+    .mat-row {
+
+      &:hover {
+        background-color: mat-color($accent, 100, 0.3);
+      }
+
+      .isx-selection {
+        background-color: mat-color($accent, 100, 0.7);
+      }
+    }
+  }
+}
+
+/** THEME**/
+$gvd-gray: (
+        100: #F2F2F2,
+        300: #DDDDDD,
+        400: #CCCCCC,
+        500: #9B9B9B,
+        700: #2F3335,
+        900: #000000,
+        A100: #FAFAFA,
+        A300: #F1F1F1,
+        A500: #FFFFFF,
+        contrast: (
+                100: #000000,
+                300: #000000,
+                400: #000000,
+                500: $white-87-opacity,
+                700: $white-87-opacity,
+                900: $white-87-opacity,
+                A100: #000000,
+                A300: #000000,
+                A500: #000000
+        )
+);
+
+$gvd-teal: (
+        100: #8EF5EA,
+        300: #00E8DB,
+        500: #00B4B2,
+        700: #018596,
+        900: #005260,
+        contrast: (
+                100: $black-87-opacity,
+                300: $black-87-opacity,
+                500: $white-87-opacity,
+                700: $white-87-opacity,
+                900: $white-87-opacity,
+        )
+);
+
+$desktop-primary: mat-palette($gvd-gray, 700, 500, 900);
+$desktop-accent: mat-palette($gvd-teal, 700, 500, 900);
+$desktop-warn: mat-palette($mat-red, 700, 500, 800);
+$desktop-theme: mat-light-theme($desktop-primary, $desktop-accent, $desktop-warn);
+
+@include table($desktop-theme);
+@include virtual-scroll($desktop-theme);
+@include drag-and-drop($desktop-theme);
+@include selection($desktop-theme);
+//@include resize();
+//@include row-buttons();

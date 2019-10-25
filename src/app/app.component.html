@@ -5,6 +5,7 @@
   <button mat-raised-button (click)="toggleFilter = !toggleFilter">Toggle filter</button>
 </div>
 
+<!--
 <mat-table [dataSource]="dataSource"
            tabindex="-1" (keydown)="$event.preventDefault()"
            (keyup.arrowUp)="dataSource.selectPrevElement(); viewScroll.scrollIntoView(dataSource.lastSelected)"
@@ -74,4 +75,55 @@
     </mat-row>
   </ng-template>
 </mat-table>
+-->
 
+<mat-table [dataSource]="dataSource"
+           tabindex="-1" (keydown)="$event.preventDefault()"
+           (keyup.arrowUp)="dataSource.selectPrevElement(); viewScroll.scrollIntoView(dataSource.lastSelected)"
+           (keyup.arrowDown)="dataSource.selectNextElement(); viewScroll.scrollIntoView(dataSource.lastSelected);"
+           [isxColumnDrag]="columnsToDisplay" (drop)="columnsToDisplay = $event; console($event); changeDetectorRef.detectChanges()"
+           isxVirtualScrollViewport #viewScroll=isxVirtualScrollViewport (fetchNextPage)="fetchNextPage($event)">
+
+  <ng-container matColumnDef="OBJECT_SELECTION">
+    <mat-header-cell *matHeaderCellDef [style.width.px]="36">
+      <mat-checkbox [checked]="dataSource.isSelectedAll" [indeterminate]="dataSource.isSelectedPartial" [disabled]="!dataSource.isData"
+                    (change)="dataSource.toggleAllCheck($event.checked)"></mat-checkbox>
+    </mat-header-cell>
+    <mat-cell *matCellDef="let element" [style.width.px]="36">
+      <mat-checkbox [checked]="dataSource.isSelectedCheck(element)"
+                    (change)="dataSource.toggleCheck(element); changeDetectorRef.detectChanges()"
+                    (click)="$event.stopPropagation()"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="filter_OBJECT_SELECTION">
+    <mat-header-cell *matHeaderCellDef [style.width.px]="36"></mat-header-cell>
+  </ng-container>
+
+  <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
+    <ng-container *ngIf="column != 'name'">
+      <mat-header-cell *matHeaderCellDef [style.width.px]="100" isx-column-drag-header> {{format(column)}} </mat-header-cell>
+      <mat-cell *matCellDef="let element" [style.width.px]="100" isx-column-drag-cell> {{element[column]}} </mat-cell>
+    </ng-container>
+    <ng-container *ngIf="column == 'name'">
+      <mat-header-cell *matHeaderCellDef [style.width.px]="200"> {{format(column)}} - no drag </mat-header-cell>
+      <mat-cell *matCellDef="let element" [style.width.px]="200"> {{element[column]}} </mat-cell>
+    </ng-container>
+  </ng-container>
+
+  <ng-container [matColumnDef]="column" *ngFor="let column of filteredColumnsToDisplay">
+    <ng-container *ngIf="column != 'filter_name'">
+      <mat-header-cell *matHeaderCellDef [style.width.px]="100" [isx-column-drag-cell]="parentHeader(column)"> {{format(column)}} </mat-header-cell>
+    </ng-container>
+    <ng-container *ngIf="column == 'filter_name'">
+      <mat-header-cell *matHeaderCellDef [style.width.px]="200"></mat-header-cell>
+    </ng-container>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="['OBJECT_SELECTION'].concat(columnsToDisplay)"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="['filter_OBJECT_SELECTION'].concat(filteredColumnsToDisplay)" [class.hidden]="!toggleFilter"></mat-header-row>
+
+  <ng-template let-row matRowDef [matRowDefColumns]="['OBJECT_SELECTION'].concat(columnsToDisplay)" isxVirtualFor>
+    <mat-row (click)="dataSource.selectLine(row); changeDetectorRef.detectChanges()" [class.isx-selected]="selectionModel.isSelected(row)"></mat-row>
+  </ng-template>
+</mat-table>
