@@ -25,8 +25,6 @@ export class IsxRowActionDirective implements AfterContentInit, OnDestroy {
   @Input() allowMouseFollow = true;
   @Input() leftOffset = 0;
 
-  private gradientOffset = 24;
-
   constructor(private _viewContainerRef: ViewContainerRef,
               private ngZone: NgZone,
               private el: ElementRef,
@@ -46,8 +44,8 @@ export class IsxRowActionDirective implements AfterContentInit, OnDestroy {
         .subscribe((event: MouseEvent) => {
           if (this.allowMouseFollow) {
             let offsetX = 0;
-            if(event.clientX + viewRef.rootNodes[0].clientWidth + this.gradientOffset > screen.availWidth) {
-              offsetX = event.layerX - viewRef.rootNodes[0].clientWidth - this.gradientOffset;
+            if(event.clientX + viewRef.rootNodes[0].clientWidth > screen.availWidth) {
+              offsetX = event.layerX - viewRef.rootNodes[0].clientWidth;
             } else {
               offsetX = event.layerX;
             }

@@ -151,6 +151,11 @@
 @mixin row-buttons() {
   .mat-table {
     .mat-row {
+
+      .isx-over-table-actions {
+        z-index: 2;
+      }
+
       position: relative;
       &:hover {
         .isx-table-actions-show-container {

@@ -20,8 +20,9 @@
                     (change)="dataSource.toggleAllCheck($event.checked)"></mat-checkbox>
     </mat-header-cell>
     <mat-cell *matCellDef="let element" [style.width.px]="30">
-      <mat-checkbox [checked]="dataSource.isSelectedCheck(element)"
-                    (change)="dataSource.toggleCheck(element)"
+      <mat-checkbox class="isx-over-table-actions"
+                    [checked]="dataSource.isSelectedCheck(element)"
+                    (change)="dataSource.toggleCheck(element); changeDetectorRef.detectChanges()"
                     (click)="$event.stopPropagation()"></mat-checkbox>
     </mat-cell>
   </ng-container>
@@ -32,8 +33,8 @@
 
   <ng-container [matColumnDef]="column" *ngFor="let column of columnsToDisplay">
     <ng-container *ngIf="column != 'name'">
-      <mat-header-cell *matHeaderCellDef mat-sort-header isx-column-drag-header isx-column-resize-header [style.width.px]="100"> {{format(column)}} </mat-header-cell>
-      <mat-cell *matCellDef="let element" isx-column-drag-cell isx-column-resize-cell [style.width.px]="100"> {{element[column]}} </mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header isx-column-drag-header isx-column-resize-header [style.width.px]="100" [style.minWidth.px]="50"> {{format(column)}} </mat-header-cell>
+      <mat-cell *matCellDef="let element" isx-column-drag-cell isx-column-resize-cell [style.width.px]="100" [style.minWidth.px]="50"> {{element[column]}} </mat-cell>
     </ng-container>
     <ng-container *ngIf="column == 'name'">
       <mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="200"> {{format(column)}} - no drag </mat-header-cell>
